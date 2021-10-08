@@ -4,12 +4,23 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"type": "shell",
+			"label": "Run with arguments",
+			"command": "javac ${fileBasename} && xargs -d '\n' java ${fileBasenameNoExtension} < ${fileBasenameNoExtension}.args",
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"detail": "Runs piping from fileBasename.args to launch arguments",
+			"problemMatcher": []
+		},
+		{
 			"label": "clean bytecode",
 			"type": "shell",
 			"command": "rm *.class",
 			"options": {
 				"cwd": "${fileDirname}"
 			},
+      "detail": "Remove all files with .class extention",
 			"problemMatcher": []
 		}
 	]
