@@ -1,4 +1,4 @@
-class GCD {
+public class GCD {
   public static int gcd(int a, int b) {
     if (a == 0)
       return b;
