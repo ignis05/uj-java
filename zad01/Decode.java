@@ -1,12 +1,26 @@
+/**
+ * Decoder class for zad01
+ * 
+ * @author Grzegorz Mikołajczyk
+ */
 class Decode extends DecoderInterface {
+  /** Counts length of sequence of 1's */
   private int oneC;
+  /** Defines size of X sequence */
   private int xSize;
+  /** Holds partial result string */
   private String out;
 
+  /** Calls reset() method on Object initialization */
   public Decode() {
     reset();
   }
 
+  /**
+   * Reads a single bit and processes it.
+   * 
+   * @param bit Integer holding a single bit
+   */
   @Override
   public void input(int bit) {
     // sequence before X size is decoded
@@ -42,11 +56,19 @@ class Decode extends DecoderInterface {
 
   }
 
+  /**
+   * Returns decoded String
+   * 
+   * @return String with decoded sequence
+   */
   @Override
   public String output() {
     return out;
   }
 
+  /**
+   * Sets all properties to their initial values
+   */
   @Override
   public void reset() {
     oneC = 0;
