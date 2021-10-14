@@ -38,6 +38,28 @@ public class Test {
       System.out.println("All tests passed");
     else
       System.out.println(errorCount + " tests failed");
+
+    Decode decoder2 = new Decode();
+    decoder.input(1);
+    decoder2.input(1);
+    decoder.input(0);
+    decoder2.input(0);
+    decoder.input(1);
+    decoder2.input(1);
+    decoder.input(1);
+    decoder2.input(1);
+    decoder.input(0);
+    decoder2.input(0);
+    if (!decoder.output().equals(decoder2.output()))
+      System.err.println("Error: test 1 failed");
+    if (!decoder.output().equals( "01" ))
+      System.err.println("Error: test 2 failed");
+    decoder.reset();
+    if (!decoder.output().equals(""))
+      System.err.println("Error: test 3 failed");
+    if (decoder.output().equals(decoder2.output()) )
+      System.err.println("Error: test 4 failed");
+
   }
 
 }
