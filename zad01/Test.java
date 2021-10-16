@@ -34,6 +34,13 @@ public class Test {
     testString(decoder, "110111101111110111111110", "0123");
     testString(decoder, "00000000000000011000000000000011110000000000000011111100000000001111111100000000000", "0123");
 
+    testString(decoder, "101011011100101110111", "001202");
+    testString(decoder, "000000001110000000111111111000111", "02");
+    testString(decoder, "1111111111111111111011111111111111111110", "00");
+    testString(decoder, "110111111110111111011110110", "03210");
+    testString(decoder, "111111111111110111111111111111111111111111111111111111111111111111111110", "03");
+    testString(decoder, "0000111111111111110000000000111111111111111111111111111111111111111111111111111111110000000", "03");
+
     if (errorCount == 0)
       System.out.println("All tests passed");
     else
@@ -52,12 +59,12 @@ public class Test {
     decoder2.input(0);
     if (!decoder.output().equals(decoder2.output()))
       System.err.println("Error: test 1 failed");
-    if (!decoder.output().equals( "01" ))
+    if (!decoder.output().equals("01"))
       System.err.println("Error: test 2 failed");
     decoder.reset();
     if (!decoder.output().equals(""))
       System.err.println("Error: test 3 failed");
-    if (decoder.output().equals(decoder2.output()) )
+    if (decoder.output().equals(decoder2.output()))
       System.err.println("Error: test 4 failed");
 
   }
