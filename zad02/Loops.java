@@ -11,6 +11,11 @@ class Loops implements GeneralLoops {
   private List<Integer> lowerLimits;
   private List<Integer> upperLimits;
 
+  Loops() {
+    lowerLimits = new ArrayList<Integer>(0);
+    upperLimits = new ArrayList<Integer>(0);
+  }
+
   @Override
   public void setLowerLimits(List<Integer> limits) {
     this.lowerLimits = limits;
@@ -44,7 +49,7 @@ class Loops implements GeneralLoops {
    * @return Return list with all values that can appear on a certain depth
    */
   private List<Integer> getDepthValues(int depth) {
-    List<Integer> result = new ArrayList<Integer>();
+    List<Integer> result = new ArrayList<Integer>(0);
     for (int i = lowerLimits.get(depth); i <= upperLimits.get(depth); i++) {
       result.add(i);
     }
@@ -53,11 +58,23 @@ class Loops implements GeneralLoops {
 
   @Override
   public List<List<Integer>> getResult() {
+    // make limits list same size - used when only one of the lists is set
+    while (lowerLimits.size() < upperLimits.size()) {
+      lowerLimits.add(0);
+    }
+    while (upperLimits.size() < lowerLimits.size()) {
+      upperLimits.add(0);
+    }
+
+    List<List<Integer>> result = new ArrayList<List<Integer>>(0);
+
+    // return empty list when both sizes are 0
+    if (lowerLimits.size() == 0 && upperLimits.size() == 0)
+      return result;
 
     // create 2d table
-    List<List<Integer>> result = new ArrayList<List<Integer>>();
     for (int i = 0; i < this.getDepthFrequency(-1); i++) {
-      result.add(new ArrayList<Integer>());
+      result.add(new ArrayList<Integer>(0));
     }
 
     // fill 2d table
