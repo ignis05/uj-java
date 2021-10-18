@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 /**
  * Loops class for zad02
- * 
- * @author Grzegorz Mikołajczyk
  */
 class Loops implements GeneralLoops {
 

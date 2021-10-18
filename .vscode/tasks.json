@@ -20,7 +20,17 @@
 			"options": {
 				"cwd": "${fileDirname}"
 			},
-      "detail": "Remove all files with .class extention",
+			"detail": "Remove all files with .class extention",
+			"problemMatcher": []
+		},
+		{
+			"label": "test ascii",
+			"type": "shell",
+			"command": "py ascii_tester.py \"${file}\"",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"detail": "Checks if file contains non-ascii characters",
 			"problemMatcher": []
 		}
 	]

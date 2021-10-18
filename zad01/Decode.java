@@ -1,7 +1,5 @@
 /**
  * Decoder class for zad01
- * 
- * @author Grzegorz Mikołajczyk
  */
 class Decode extends DecoderInterface {
   /** Counts length of sequence of 1's */
