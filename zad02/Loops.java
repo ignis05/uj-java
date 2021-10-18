@@ -34,12 +34,20 @@ class Loops implements GeneralLoops {
    * @return How many times in a row a certain value should appear on certain
    *         depth
    */
-  private int getDepthFrequency(int depth) {
-    int frequency = 1;
-    for (int i = depth + 1; i < lowerLimits.size(); i++) {
-      frequency *= (upperLimits.get(i) - lowerLimits.get(i)) + 1;
+  private long getDepthFrequency(int depth) {
+    if (depth == -1) {
+      long frequency = 1;
+      for (int i = 0; i < lowerLimits.size(); i++) {
+        frequency *= (upperLimits.get(i) - lowerLimits.get(i)) + 1;
+        if (frequency <= 0) {
+          System.err.println("partfreq invalid: " + frequency);
+          System.exit(1);
+        }
+      }
+      return frequency;
+    } else {
+      return getDepthFrequency(depth - 1) / this.getDepthValues(depth).size();
     }
-    return frequency;
   }
 
   /**
@@ -82,16 +90,16 @@ class Loops implements GeneralLoops {
       // values appearing on certain depth
       List<Integer> depthValues = this.getDepthValues(depth);
       // how many times each value appears in the row
-      int depthFrequency = this.getDepthFrequency(depth);
+      long depthFrequency = this.getDepthFrequency(depth);
       // number of depth values * frequency - used to calculate how many times the
       // cycle needs to be repeated on certian depth
-      int serieSize = depthValues.size() * depthFrequency;
+      long serieSize = depthValues.size() * depthFrequency;
       for (int repeats = 0; repeats < this.getDepthFrequency(-1) / serieSize; repeats++) {
         for (int i = 0; i < depthValues.size(); i++) {
           int value = depthValues.get(i);
           for (int j = 0; j < depthFrequency; j++) {
             // which list in 1D table to append to
-            int insertionIndex = (repeats * serieSize) + (i * depthFrequency) + j;
+            int insertionIndex = (int) ((repeats * serieSize) + (i * depthFrequency) + j);
             List<Integer> deepList = result.get(insertionIndex);
             deepList.add(value);
           }
