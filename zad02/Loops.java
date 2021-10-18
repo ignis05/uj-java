@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Loops class for zad02
@@ -74,12 +75,11 @@ class Loops implements GeneralLoops {
       upperLimits.add(0);
     }
 
-    List<List<Integer>> result = new ArrayList<List<Integer>>(0);
-
     // return empty list when both sizes are 0
     if (lowerLimits.size() == 0 && upperLimits.size() == 0)
-      return result;
+      return Arrays.asList(Arrays.asList(0));
 
+    List<List<Integer>> result = new ArrayList<List<Integer>>(0);
     // create 2d table
     for (int i = 0; i < this.getDepthFrequency(-1); i++) {
       result.add(new ArrayList<Integer>(0));
