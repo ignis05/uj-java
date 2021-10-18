@@ -68,7 +68,7 @@ public class Test {
     loopTest.setLowerLimits(List.of(1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1));
     loopTest.setUpperLimits(List.of(3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 3, 3, 3, 2, 2));
     if (loopTest.getResult().toString().length() != 473651712) {
-      System.err.println("15 loops test failed, but probably java crashed before you could see this message");
+      System.err.println("15 loops test failed, but program managed to not crash");
     } else {
       System.out.println("Program managed to not crash with 15 loops and the result length seems ok ¯\\_(ツ)_/¯");
     }
