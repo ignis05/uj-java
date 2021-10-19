@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Arrays;
 
 /**
@@ -11,8 +12,8 @@ class Loops implements GeneralLoops {
   private List<Integer> upperLimits;
 
   Loops() {
-    lowerLimits = new ArrayList<Integer>(0);
-    upperLimits = new ArrayList<Integer>(0);
+    lowerLimits = new LinkedList<Integer>();
+    upperLimits = new LinkedList<Integer>();
   }
 
   @Override
@@ -56,7 +57,7 @@ class Loops implements GeneralLoops {
    * @return Return list with all values that can appear on a certain depth
    */
   private List<Integer> getDepthValues(int depth) {
-    List<Integer> result = new ArrayList<Integer>(0);
+    List<Integer> result = new LinkedList<Integer>();
     for (int i = lowerLimits.get(depth); i <= upperLimits.get(depth); i++) {
       result.add(i);
     }
@@ -77,10 +78,12 @@ class Loops implements GeneralLoops {
     if (lowerLimits.size() == 0 && upperLimits.size() == 0)
       return Arrays.asList(Arrays.asList(0));
 
-    List<List<Integer>> result = new ArrayList<List<Integer>>(0);
+    long axisSize = this.getDepthFrequency(-1);
+
+    List<List<Integer>> result = new ArrayList<List<Integer>>((int) axisSize);
     // create 2d table
-    for (int i = 0; i < this.getDepthFrequency(-1); i++) {
-      result.add(new ArrayList<Integer>(0));
+    for (int i = 0; i < axisSize; i++) {
+      result.add(new LinkedList<Integer>());
     }
 
     // fill 2d table
@@ -92,7 +95,7 @@ class Loops implements GeneralLoops {
       // number of depth values * frequency - used to calculate how many times the
       // cycle needs to be repeated on certian depth
       long serieSize = depthValues.size() * depthFrequency;
-      for (int repeats = 0; repeats < this.getDepthFrequency(-1) / serieSize; repeats++) {
+      for (int repeats = 0; repeats < axisSize / serieSize; repeats++) {
         for (int i = 0; i < depthValues.size(); i++) {
           int value = depthValues.get(i);
           for (int j = 0; j < depthFrequency; j++) {
