@@ -56,35 +56,30 @@ public class Test {
 
     // test 1 normal method call
     if (!result1.equals(expected1)) {
-      System.err.println("Error: test " + testCount + " failed:");
       pError(null, List.of(1, 1, 2), expected1, result1);
     }
     testCount++;
 
     // call getResult() twice in a row
     if (!result2.equals(expected1)) {
-      System.err.println("Error: test " + testCount + " failed:");
       pError(null, List.of(1, 1, 2), expected1, result2);
     }
     testCount++;
 
     // update upperLimit on existing object
     if (!result3.equals(expected3)) {
-      System.err.println("Error: test " + testCount + " failed:");
       pError(null, List.of(1, 1, 2, 0), expected3, result3);
     }
     testCount++;
 
     // set lowerLimit after getResult() was once called
     if (!result4.equals(expected4)) {
-      System.err.println("Error: test " + testCount + " failed:");
       pError(List.of(-1, -1, 1, 0), List.of(1, 1, 2, 0), expected4, result4);
     }
     testCount++;
 
     // update lowerLimit after getResult() was once called
     if (!result5.equals(expected3)) {
-      System.err.println("Error: test " + testCount + " failed:");
       pError(List.of(0, 0, 0, 0), List.of(1, 1, 2, 0), expected4, result5);
     }
     testCount++;
