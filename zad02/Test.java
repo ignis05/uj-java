@@ -38,7 +38,7 @@ public class Test {
     String expected1 = "[[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 1, 0], [0, 1, 1], [0, 1, 2], [1, 0, 0], [1, 0, 1], [1, 0, 2], [1, 1, 0], [1, 1, 1], [1, 1, 2]]";
 
     String result2 = loopTest.getResult().toString();
-    // should match expected2
+    // should match expected1
 
     loopTest.setUpperLimits(List.of(1, 1, 2, 0));
     String result3 = loopTest.getResult().toString();
