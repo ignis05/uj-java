@@ -83,7 +83,7 @@ class Loops implements GeneralLoops {
     List<List<Integer>> result = new ArrayList<List<Integer>>((int) axisSize);
     // create 2d table
     for (int i = 0; i < axisSize; i++) {
-      result.add(new LinkedList<Integer>());
+      result.add(new ArrayList<Integer>(0));
     }
 
     // fill 2d table

@@ -3,7 +3,7 @@ import java.util.List;
 public class Test {
 
   // if false skips test with 15 nested loops
-  static final boolean doLargeTest = false;
+  static final boolean doLargeTest = true;
 
   static int errorCount = 0;
   static int testCount = 0;
@@ -125,14 +125,15 @@ public class Test {
     if (!doLargeTest)
       return;
     // test with 15 nested loops
-    System.out.println("\n------\nTesting with 15 nested loops - this might take a moment");
+    System.out.println("\n------\nTesting with 15 nested loops - this might take a moment ( ram="
+        + String.format("%.02f", Runtime.getRuntime().maxMemory() / 1073741824f) + "GB )");
     Loops loopTest = new Loops();
     loopTest.setLowerLimits(List.of(1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1));
     loopTest.setUpperLimits(List.of(3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 3, 3, 3, 2, 2));
     if (loopTest.getResult().toString().length() != 473651712) {
       System.err.println("15 loops test failed, but program managed to not crash");
     } else {
-      System.out.println("Program managed to not crash with 15 loops and the result length seems ok ¯\\_(ツ)_/¯");
+      System.out.println("Program managed to not crash with 15 loops and the result length seems ok");
     }
   }
 }
