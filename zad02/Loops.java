@@ -18,12 +18,12 @@ class Loops implements GeneralLoops {
 
   @Override
   public void setLowerLimits(List<Integer> limits) {
-    this.lowerLimits = limits;
+    this.lowerLimits = new ArrayList<>(limits);
   }
 
   @Override
   public void setUpperLimits(List<Integer> limits) {
-    this.upperLimits = limits;
+    this.upperLimits = new ArrayList<>(limits);
   }
 
   /**

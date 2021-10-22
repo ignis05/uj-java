@@ -1,9 +1,10 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
 
   // if false skips test with 15 nested loops
-  static final boolean doLargeTest = true;
+  static final boolean doLargeTest = false;
 
   static int errorCount = 0;
   static int testCount = 0;
@@ -49,9 +50,14 @@ public class Test {
     String result4 = loopTest.getResult().toString();
     String expected4 = "[[-1, -1, 1, 0], [-1, -1, 2, 0], [-1, 0, 1, 0], [-1, 0, 2, 0], [-1, 1, 1, 0], [-1, 1, 2, 0], [0, -1, 1, 0], [0, -1, 2, 0], [0, 0, 1, 0], [0, 0, 2, 0], [0, 1, 1, 0], [0, 1, 2, 0], [1, -1, 1, 0], [1, -1, 2, 0], [1, 0, 1, 0], [1, 0, 2, 0], [1, 1, 1, 0], [1, 1, 2, 0]]";
 
-    loopTest.setLowerLimits(List.of(0, 0, 0, 0));
+    List<Integer> list1 = new ArrayList<>(List.of(0, 0, 0, 0));
+    loopTest.setLowerLimits(list1);
 
     String result5 = loopTest.getResult().toString();
+    // should match expected3
+
+    list1.set(1, -3);
+    String result6 = loopTest.getResult().toString();
     // should match expected3
 
     // test 1 normal method call
@@ -80,7 +86,13 @@ public class Test {
 
     // update lowerLimit after getResult() was once called
     if (!result5.equals(expected3)) {
-      pError(List.of(0, 0, 0, 0), List.of(1, 1, 2, 0), expected4, result5);
+      pError(List.of(0, 0, 0, 0), List.of(1, 1, 2, 0), expected3, result5);
+    }
+    testCount++;
+
+    // getResult() after updating list reference
+    if (!result6.equals(expected3)) {
+      pError(List.of(0, 0, 0, 0), List.of(1, 1, 2, 0), expected3, result6);
     }
     testCount++;
 
