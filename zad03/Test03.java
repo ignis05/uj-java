@@ -92,6 +92,6 @@ public class Test03 {
     if (dec.getCode().size() != 0 || dec.getDecode().size() != 0)
       throw new Exception("invalid input test failed");
 
-    System.out.println("All test passed succesfully");
+    System.out.println("All tests passed successfully");
   }
 }
