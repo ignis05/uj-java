@@ -43,6 +43,20 @@ public class Test03 {
         "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
       throw new Exception("exact input test failed: " + res);
 
+    // ==== pattern in the middle test ====
+    dec.setInputText(
+        "dupa Wydział Przyrodniczy xDD aaa Wydział Fizyki, Astronomii i Informatyki Stosowanej oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds ");
+    if (!res.equals(
+        "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
+      throw new Exception("pattern in the middle test failed: " + res);
+
+    // ==== pattern in the end ====
+    dec.setInputText(
+        "dupa Wydział Przyrodniczy xDD aaa  oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds. I tak was wszystkich upierdolimy, podpisano Wydział Fizyki, Astronomii i Informatyki Stosowanej");
+    if (!res.equals(
+        "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
+      throw new Exception("pattern in the end failed: " + res);
+
     // ==== caesar's cipher ROT10 map generation ====
     String rot10 = "Ginjskł Psjius, Kcdbyxywss s Sxpybwkdius Cdycygkxot yqłkcjk, żo s dku gcjicdusmr xk xewobukmr gizsobnyvs hN";
     dec.setInputText(rot10);
