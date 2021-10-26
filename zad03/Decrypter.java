@@ -9,7 +9,7 @@ class Decrypter implements DecrypterInterface {
 
   private Map<Character, Character> code = new HashMap<>();
   private Map<Character, Character> decode = new HashMap<>();
-  private final List<String> validPattern = List.of("Wydział", "Fizyki,", "Astronomii", "i", "Informatyki",
+  private final List<String> validPattern = List.of("Wydzia\u0142", "Fizyki,", "Astronomii", "i", "Informatyki",
       "Stosowanej");
 
   /**
