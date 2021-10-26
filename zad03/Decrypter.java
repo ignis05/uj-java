@@ -19,8 +19,11 @@ class Decrypter implements DecrypterInterface {
    * @return boolean with test result
    */
   private boolean patternMatcher(List<String> pattern) {
+    if (pattern.get(1).charAt(6) != ',')
+      return false;
     String patternStr = String.join(" ", pattern);
     String validPatternStr = String.join(" ", validPattern);
+    // required comma check
     // for each word
     for (int wordNo = 0; wordNo < validPattern.size(); wordNo++) {
       String validWord = validPattern.get(wordNo);
@@ -116,6 +119,8 @@ class Decrypter implements DecrypterInterface {
       String word = header.get(wI);
       String decodedWord = validPattern.get(wI);
       for (int i = 0; i < decodedWord.toCharArray().length; i++) {
+        if (word.charAt(i) == ',')
+          continue; // skip ,
         this.code.putIfAbsent(decodedWord.charAt(i), word.charAt(i));
         this.decode.putIfAbsent(word.charAt(i), decodedWord.charAt(i));
       }
