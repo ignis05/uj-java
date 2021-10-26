@@ -3,11 +3,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 class Decrypter implements DecrypterInterface {
 
-  private Map<Character, Character> code = new HashMap<>();;
-  private Map<Character, Character> decode = new HashMap<>();;
+  private Map<Character, Character> code = new HashMap<>();
+  private Map<Character, Character> decode = new HashMap<>();
+  private final List<String> validPattern = List.of("Wydział", "Fizyki,", "Astronomii", "i", "Informatyki",
+      "Stosowanej");
 
   /**
    * Returns true if pattern is correct, false otherwise
@@ -16,136 +19,31 @@ class Decrypter implements DecrypterInterface {
    * @return boolean with test result
    */
   private boolean patternMatcher(List<String> pattern) {
-    String headerStr = String.join(" ", pattern);
-    // Wydział Fizyki, Astronomii i Informatyki Stosowanej
-    // W 0-0
-    if (headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(0)).count() != 1) {
-      // System.out.println("Failed pattern match for 'W'");
-      return false;
-    }
-    // y 0-1 1-3 4-8
-    if (pattern.get(0).charAt(1) != pattern.get(1).charAt(3) || pattern.get(1).charAt(3) != pattern.get(4).charAt(8)
-        || headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(1)).count() != 3) {
-      // System.out.println("Failed pattern match for 'y'");
-      return false;
-    }
-    // d 0-2
-    if (headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(2)).count() != 1) {
-      // System.out.println("Failed pattern match for 'd'");
-      return false;
-    }
-    // z 0-3 1-2
-    if (pattern.get(0).charAt(3) != pattern.get(1).charAt(2)
-        || headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(3)).count() != 2) {
-      // System.out.println("Failed pattern match for 'z'");
-      return false;
-    }
-    // i 0-4 1-1 1-5 2-8 2-9 3-0 4-10
-    if (pattern.get(0).charAt(4) != pattern.get(1).charAt(1) || pattern.get(1).charAt(1) != pattern.get(1).charAt(5)
-        || pattern.get(1).charAt(5) != pattern.get(2).charAt(8) || pattern.get(2).charAt(8) != pattern.get(2).charAt(9)
-        || pattern.get(2).charAt(9) != pattern.get(3).charAt(0) || pattern.get(3).charAt(0) != pattern.get(4).charAt(10)
-        || headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(4)).count() != 7) {
-      // System.out.println("Failed pattern match for 'i'");
-      return false;
-    }
-    // a 0-5 4-6 5-6
-    if (pattern.get(0).charAt(5) != pattern.get(4).charAt(6) || pattern.get(4).charAt(6) != pattern.get(5).charAt(6)
-        || headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(5)).count() != 3) {
-      // System.out.println("Failed pattern match for 'a'");
-      return false;
-    }
-    // ł 0-6
-    if (headerStr.chars().filter(ch -> ch == pattern.get(0).charAt(6)).count() != 1) {
-      // System.out.println("Failed pattern match for 'ł'");
-      return false;
-    }
-    // F 1-0
-    if (headerStr.chars().filter(ch -> ch == pattern.get(1).charAt(0)).count() != 1) {
-      // System.out.println("Failed pattern match for 'F'");
-      return false;
-    }
-    // k 1-4 4-9
-    if (pattern.get(1).charAt(4) != pattern.get(4).charAt(9)
-        || headerStr.chars().filter(ch -> ch == pattern.get(1).charAt(4)).count() != 2) {
-      // System.out.println("Failed pattern match for 'k'");
-      return false;
-    }
-    // , 1-6
-    if (headerStr.chars().filter(ch -> ch == pattern.get(1).charAt(6)).count() != 1) {
-      // System.out.println("Failed pattern match for ','");
-      return false;
-    }
-    // A 2-0
-    if (headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(0)).count() != 1) {
-      // System.out.println("Failed pattern match for 'A'");
-      return false;
-    }
-    // s 2-1 5-3
-    if (pattern.get(2).charAt(1) != pattern.get(5).charAt(3)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(1)).count() != 2) {
-      // System.out.println("Failed pattern match for 's'");
-      return false;
-    }
-    // t 2-2 4-7 5-1
-    if (pattern.get(2).charAt(2) != pattern.get(4).charAt(7) || pattern.get(4).charAt(7) != pattern.get(5).charAt(1)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(2)).count() != 3) {
-      // System.out.println("Failed pattern match for 't'");
-      return false;
-    }
-    // r 2-3 4-4
-    if (pattern.get(2).charAt(3) != pattern.get(4).charAt(4)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(3)).count() != 2) {
-      // System.out.println("Failed pattern match for 'r'");
-      return false;
-    }
-    // o 2-4 2-6 4-3 5-2 5-4
-    if (pattern.get(2).charAt(4) != pattern.get(2).charAt(6) || pattern.get(2).charAt(6) != pattern.get(4).charAt(3)
-        || pattern.get(4).charAt(3) != pattern.get(5).charAt(2) || pattern.get(5).charAt(2) != pattern.get(5).charAt(4)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(4)).count() != 5) {
-      // System.out.println("Failed pattern match for 'o'");
-      return false;
-    }
-    // n 2-5 4-1 5-7
-    if (pattern.get(2).charAt(5) != pattern.get(4).charAt(1) || pattern.get(4).charAt(1) != pattern.get(5).charAt(7)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(5)).count() != 3) {
-      // System.out.println("Failed pattern match for 'n'");
-      return false;
-    }
-    // m 2-7 4-5
-    if (pattern.get(2).charAt(7) != pattern.get(4).charAt(5)
-        || headerStr.chars().filter(ch -> ch == pattern.get(2).charAt(7)).count() != 2) {
-      // System.out.println("Failed pattern match for 'm'");
-      return false;
-    }
-    // I 4-0
-    if (headerStr.chars().filter(ch -> ch == pattern.get(4).charAt(0)).count() != 1) {
-      // System.out.println("Failed pattern match for 'I'");
-      return false;
-    }
-    // f 4-2
-    if (headerStr.chars().filter(ch -> ch == pattern.get(4).charAt(2)).count() != 1) {
-      // System.out.println("Failed pattern match for 'f'");
-      return false;
-    }
-    // S 5-0
-    if (headerStr.chars().filter(ch -> ch == pattern.get(5).charAt(0)).count() != 1) {
-      // System.out.println("Failed pattern match for 'S'");
-      return false;
-    }
-    // w 5-5
-    if (headerStr.chars().filter(ch -> ch == pattern.get(5).charAt(5)).count() != 1) {
-      // System.out.println("Failed pattern match for 'w'");
-      return false;
-    }
-    // e 5-8
-    if (headerStr.chars().filter(ch -> ch == pattern.get(5).charAt(8)).count() != 1) {
-      // System.out.println("Failed pattern match for 'e'");
-      return false;
-    }
-    // j 5-9
-    if (headerStr.chars().filter(ch -> ch == pattern.get(5).charAt(9)).count() != 1) {
-      // System.out.println("Failed pattern match for 'j'");
-      return false;
+    String patternStr = String.join(" ", pattern);
+    String validPatternStr = String.join(" ", validPattern);
+    // for each word
+    for (int wordNo = 0; wordNo < validPattern.size(); wordNo++) {
+      String validWord = validPattern.get(wordNo);
+      String word = pattern.get(wordNo);
+      // for each character inside word
+      for (int chNo = 0; chNo < validWord.length(); chNo++) {
+        // list of occurences in valid pattern
+        List<Integer> validIndexes = new LinkedList<Integer>();
+        for (int index = validPatternStr.indexOf(validWord.charAt(chNo)); index >= 0; index = validPatternStr
+            .indexOf(validWord.charAt(chNo), index + 1)) {
+          validIndexes.add(index);
+        }
+        // list of occurences in tested pattern
+        List<Integer> indexes = new LinkedList<Integer>();
+        for (int index = patternStr.indexOf(word.charAt(chNo)); index >= 0; index = patternStr
+            .indexOf(word.charAt(chNo), index + 1)) {
+          indexes.add(index);
+        }
+        // check list mismatch
+        if (!validIndexes.equals(indexes)) {
+          return false;
+        }
+      }
     }
     return true;
   }
@@ -158,8 +56,8 @@ class Decrypter implements DecrypterInterface {
    */
   private boolean lengthChecker(List<String> header) {
     List<Integer> lengthlist = header.stream().map(elt -> elt.length()).collect(Collectors.toList());
-    String corLengths = "[7, 7, 10, 1, 11, 10]";
-    return lengthlist.toString().equals(corLengths);
+    List<Integer> corLengths = validPattern.stream().map(el -> el.length()).collect(Collectors.toList());
+    return lengthlist.equals(corLengths);
   }
 
   @Override
@@ -176,23 +74,23 @@ class Decrypter implements DecrypterInterface {
     List<String> split = new LinkedList<String>(List.of(encryptedDocument.split("\\s")));
     // trim empty subarrays
     split.removeIf(item -> "".equals(item));
-    // get only 6 first words
-    if (split.size() < 6)
+    // list too short to contain pattern
+    if (split.size() < validPattern.size())
       return;
 
     List<String> header = null;
 
     // get all words with 7 letters as possible pattern starters
-    List<String> starterWords = split.stream().filter(x -> x.length() == 7).collect(Collectors.toList());
-    for (String word : starterWords) {
-      int index = split.indexOf(word);
+    int[] starterWordsIndexes = IntStream.range(0, split.size())
+        .filter(x -> split.get(x).length() == validPattern.get(0).length()).toArray();
+    for (int index : starterWordsIndexes) {
       // System.out.println("Possible start word: `" + word + "` at index " + index);
 
       // end of possible patterns
-      if (index + 5 >= split.size())
+      if (index + validPattern.size() - 1 >= split.size())
         return;
 
-      header = split.subList(index, index + 6);
+      header = split.subList(index, index + validPattern.size());
 
       // check if word lengths are correct
       if (!lengthChecker(header)) {
@@ -214,10 +112,9 @@ class Decrypter implements DecrypterInterface {
     }
 
     // create code and decode maps
-    String[] decodedWords = { "Wydział", "Fizyki,", "Astronomii", "i", "Informatyki", "Stosowanej" };
-    for (int wI = 0; wI < decodedWords.length; wI++) {
+    for (int wI = 0; wI < validPattern.size(); wI++) {
       String word = header.get(wI);
-      String decodedWord = decodedWords[wI];
+      String decodedWord = validPattern.get(wI);
       for (int i = 0; i < decodedWord.toCharArray().length; i++) {
         this.code.putIfAbsent(decodedWord.charAt(i), word.charAt(i));
         this.decode.putIfAbsent(word.charAt(i), decodedWord.charAt(i));

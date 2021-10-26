@@ -39,6 +39,7 @@ public class Test03 {
 
     // ==== exact input test ====
     dec.setInputText("Wydział Fizyki, Astronomii i Informatyki Stosowanej");
+    res = dec.getCode().toString();
     if (!res.equals(
         "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
       throw new Exception("exact input test failed: " + res);
@@ -46,6 +47,7 @@ public class Test03 {
     // ==== pattern in the middle test ====
     dec.setInputText(
         "dupa Wydział Przyrodniczy xDD aaa Wydział Fizyki, Astronomii i Informatyki Stosowanej oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds ");
+    res = dec.getCode().toString();
     if (!res.equals(
         "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
       throw new Exception("pattern in the middle test failed: " + res);
@@ -53,9 +55,18 @@ public class Test03 {
     // ==== pattern in the end ====
     dec.setInputText(
         "dupa Wydział Przyrodniczy xDD aaa  oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds. I tak was wszystkich upierdolimy, podpisano Wydział Fizyki, Astronomii i Informatyki Stosowanej");
+    res = dec.getCode().toString();
     if (!res.equals(
         "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
       throw new Exception("pattern in the end failed: " + res);
+
+    // ==== pattern in the middle with another fake pattern ====
+    dec.setInputText(
+        "dupa Wydział Przyrodniczy Wydzaał Fizyki, Astronomii i Informatyki Stosowanej xDD aaa Wydział Fizyki, Astronomii i Informatyki Stosowanej oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds ");
+    res = dec.getCode().toString();
+    if (!res.equals(
+        "{a=a, A=A, ł=ł, d=d, e=e, F=F, f=f, i=i, I=I, j=j, k=k, ,=,, m=m, n=n, o=o, r=r, s=s, S=S, t=t, W=W, w=w, y=y, z=z}"))
+      throw new Exception("pattern in the middle with another fake pattern test failed: " + res);
 
     // ==== caesar's cipher ROT10 map generation ====
     String rot10 = "Ginjskł Psjius, Kcdbyxywss s Sxpybwkdius Cdycygkxot yqłkcjk, żo s dku gcjicdusmr xk xewobukmr gizsobnyvs hN";
