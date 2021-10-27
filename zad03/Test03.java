@@ -39,6 +39,20 @@ public class Test03 {
       throw new Exception("test 1 failed, result: " + res);
     testCount++;
 
+    // ==== test oramusa (code) ====
+    String test2 = "Dxb80 1*9c3ó8\n1023*4Ł f*30{*, 5678x!xW**\n*\n}!#x8W470{* s7x6xw4!9i";
+    dec.setInputText(test2);
+    res = dec.getCode().toString();
+    if (!res.equals("{a=4, A=5, ł=Ł, d=2, e=9, F=f, f=#, i=*, I=}, j=i, k={, m=W, n=!, o=x, r=8, s=6, S=s, t=7, W=1, w=w, y=0, z=3}"))
+      throw new Exception("test oramusa (code) failed: " + res);
+    testCount++;
+
+    // ==== test oramusa (original string match) ====
+    String decodedStr = decryptText(dec.getDecode(), test2);
+    if (!decodedStr.equals("Dobry Wieczór\nWydział Fizyki, Astronomii\ni\nInformatyki Stosowanej"))
+      throw new Exception("test oramusa (original string match) failed: " + decodedStr);
+    testCount++;
+
     // ==== exact input test ====
     dec.setInputText("Wydział Fizyki, Astronomii i Informatyki Stosowanej");
     res = dec.getCode().toString();
@@ -92,7 +106,7 @@ public class Test03 {
     testCount++;
 
     // ==== caesar's cipher ROT10 decryption test ====
-    String decodedStr = decryptText(dec.getDecode(), rot10);
+    decodedStr = decryptText(dec.getDecode(), rot10);
     if (!decodedStr.equals(
         "Wydział Fizyki, Astronomii i Informatyki Stosowanej oqłasza, że i tak wszystkimr na nemerkamr wyzierdovi hN"))
       throw new Exception("caesar's cipher decryption failed, result: " + decodedStr);
@@ -127,7 +141,7 @@ public class Test03 {
     String ciphered = "qF d VI Ddp JęKIG fgĄFłdNUO ŹOGÓę Kę VNDKNŃ g DdNrdN gŹIVNDg DFrdN DJŻIłp g KNRF fF ŻFrdDg?\nGIDg Kę łFRaśN ŻFgOG d RFŹÓFŃc fgĄFłdNUI? ąI ÓdN łdNG IśN ĆIĄFDÓę KęJNU g fdNrdN,\nfPęrI ÓdN JFGęŃśIĄND ÓIłNK fF ŻFrdDg d UFRF FrŻIĆIDg, GFĆNDg DFrdN FrŻIĆIf KęfP fF ÓI KF gIDĄOĆęśd DFrdN IśN ÓdN ÓIDgNRF JIJdNĆI JFśIUI ÓIDgNRF ŻFŹIUI łdNśUh FDFrp ,\nćęŹgdIĄ ydgęUd, sDKŻFÓFGdd d óÓAFŻGIKęUd vKFDFłIÓNN\nd KIU łęVhKUFłI d łIĆÓh rF KF ÓdN VNDK UKFŃ KIG KIUd DFrdN ĆN GFĆNDg RF DFrdN łęŃGdIc rF KIU fd Ddp JFŹFrI ÓdN łdNG ł VIUdNV Kę Ddp łęfPFłIĄND ŻFŹgdÓdN\nIśN fPęrI Kę ÓdN łdNG ÓdN ŻFgOGdNDg fF KF VNDK łdIŻI .\nćIŹgdIĄ ydgIUd, sDKŻFÓFGdd d óÓAFŻGIKIUd vKFDFłIÓNV FŻIg ćęŹgdIĄ ydgęUdC sDKŻFÓFGdd d óÓAFŻGIKęUd vKFDFłIÓNV FŻIg ćęŹgdIĄ ydgęUd, sęKŻFÓFGdd d óÓAFŻGIKęUd vęFDFłIÓNV\n\tćęŹgdIĄ ydgęUd,   sDKŻFÓFGdd d\tóÓAFŻGIKęUd vKFDFłIÓNV\nłdŹIf JFVpfdI F KęG UdG ręĄ JIJdNĆ VIÓ JIłNĄ2 VIU ÓdN VNDKNŃfdN ł JNĄÓd ŻFgłdÓdpKN\nOGęDĄFłF KF Ddp ÓdN gIrdNŻIVfdN gI KIUh FDFrp VIU FVfdNf DłdpKę rF KF ŃłdIŹfgę F KęG ĆN ÓdN GIfdN\nfPęrI ł ŹFGO UŻgęĆI IÓd VNŹÓNRF FrŻIgI ŃłdpKNRF ÓdN fPFŹgd KOKIV F UFŃfdaĄ GÓdN IśN łFRaśN FRaśÓdN F gIDIŹę łdIŻę ĆNrę GdNc VIUhD\nRFŹÓFŃc rF JIJdNĆ ÓdUFRF ÓdN FrŻIĆIĄ I Kę gI fF RF FrŻIĆIDg fF? ";
     dec.setInputText(ciphered);
     res = dec.getCode().toString();
-    System.out.println(decryptText(dec.getDecode(), ciphered) + "\n\n\n");
+    // System.out.println(decryptText(dec.getDecode(), ciphered) + "\n\n\n");
     if (!res.equals(
         "{a=I, A=s, ł=Ą, d=Ź, e=N, F=y, f=A, i=d, I=ó, j=V, k=U, m=G, n=Ó, o=F, r=Ż, s=D, S=v, t=K, W=ć, w=ł, y=ę, z=g}"))
       throw new Exception("random cipher test failed: " + res);
