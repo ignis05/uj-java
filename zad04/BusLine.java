@@ -310,4 +310,10 @@ class BusLine implements BusLineInterface {
     return null;
   }
 
+  @Override
+  public void addBusLine(String busLineName, Position firstPoint, Position lastPoint) {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

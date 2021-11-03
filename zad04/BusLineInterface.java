@@ -27,6 +27,16 @@ public interface BusLineInterface {
 	}
 
 	/**
+	 * Metoda dodaje linię autobusową o podanej nazwie. Wraz z nazwą linii
+	 * przekazywane są informacje o pierwszym i ostatnim punkcie na trasie.
+	 * 
+	 * @param busLineName nazwa linii
+	 * @param firstPoint  pierwszy punkt na trasie
+	 * @param lastPoint   ostatni punkt na trasie
+	 */
+	public void addBusLine(String busLineName, Position firstPoint, Position lastPoint);
+
+	/**
 	 * Metoda dodaje odcinek lineSegment do linii autobusowej o nazwie busLineName.
 	 * Odcinki nie muszą być dodawane w jakiejkolwiek kolejności. Można z nich
 	 * utworzyć całą trasę poprzez uwzględnienie położenia punktów krańcowych.
