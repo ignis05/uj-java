@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class BusLine implements BusLineInterface {
 
@@ -45,6 +46,11 @@ class BusLine implements BusLineInterface {
       this.pos = pos;
       this.col = pos.getCol();
       this.row = pos.getRow();
+    }
+
+    public boolean hasLine(String lineName) {
+      return lineName.equals(this.horizontal) || lineName.equals(this.vertical) || lineName.equals(this.slash)
+          || lineName.equals(this.backslash);
     }
   }
 
@@ -266,8 +272,24 @@ class BusLine implements BusLineInterface {
 
   @Override
   public Map<String, List<Position>> getLines() {
-    // TODO Auto-generated method stub
-    return null;
+    Map<String, List<Position>> result = new HashMap<String, List<Position>>();
+    for (var entry : this.lineMap.entrySet()) {
+      String lineName = entry.getKey();
+      List<Position> positions = entry.getValue();
+      // skip lines with no intersections
+      boolean hasIntersections = false;
+      for (var inter : this.intersections) {
+        if (inter.hasLine(lineName)) {
+          hasIntersections = true;
+          break;
+        }
+      }
+      if (!hasIntersections)
+        continue;
+      List<Position> uniquePositions = positions.stream().distinct().collect(Collectors.toList());
+      result.put(lineName, uniquePositions);
+    }
+    return result;
   }
 
   @Override

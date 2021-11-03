@@ -7,5 +7,6 @@ public class Test04 {
     b.addLineSegment("b", new LineSegment(new Position2D(8, 6), new Position2D(12, 6)));
     b.printMap();
     b.findIntersections();
+    System.out.println(b.getLines());
   }
 }
