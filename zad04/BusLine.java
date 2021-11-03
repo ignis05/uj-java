@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,27 @@ class BusLine implements BusLineInterface {
 
   }
 
+  public class Intersection {
+    public final Position pos;
+    public final int col;
+    public final int row;
+
+    public String horizontal = null;
+    public String vertical = null;
+    public String slash = null;
+    public String backslash = null;
+    public boolean isStraight = false;
+    public boolean isDiagonal = false;
+
+    Intersection(Position pos) {
+      this.pos = pos;
+      this.col = pos.getCol();
+      this.row = pos.getRow();
+    }
+  }
+
   private Map<String, List<Position>> lineMap = new HashMap<String, List<Position>>();
+  private List<Intersection> intersections;
 
   private List<Position> getPointsFromSegment(LineSegment lineSegment) {
     List<Position> result;
@@ -47,7 +68,7 @@ class BusLine implements BusLineInterface {
         low = first.getRow();
       }
       result = new ArrayList<Position>(high - low + 1);
-      for (int i = low; i < high; i++) {
+      for (int i = low; i <= high; i++) {
         result.add(new Position2D(first.getCol(), i));
       }
     }
@@ -63,7 +84,7 @@ class BusLine implements BusLineInterface {
         low = first.getCol();
       }
       result = new ArrayList<Position>(high - low + 1);
-      for (int i = low; i < high; i++) {
+      for (int i = low; i <= high; i++) {
         result.add(new Position2D(i, first.getRow()));
       }
     }
@@ -138,7 +159,13 @@ class BusLine implements BusLineInterface {
       }
     }
     StringBuilder sb = new StringBuilder();
-    for (String[] s1 : res) {
+    String[][] flipped = new String[rowSize][colSize];
+    for (int i = 0; i < rowSize; i++) {
+      for (int j = 0; j < colSize; j++) {
+        flipped[i][j] = res[j][i];
+      }
+    }
+    for (String[] s1 : flipped) {
       sb.append(Arrays.toString(s1)).append('\n');
     }
     System.out.println(sb.toString());
@@ -154,8 +181,87 @@ class BusLine implements BusLineInterface {
 
   @Override
   public void findIntersections() {
-    // TODO Auto-generated method stub
-
+    // render 2d map
+    var min = this.lineMap.entrySet().iterator().next().getValue().get(0);
+    var max = new Position2D(min.getCol(), min.getRow());
+    for (var entry : this.lineMap.entrySet()) {
+      for (var pos : entry.getValue()) {
+        if (pos.getRow() > max.getRow())
+          max = new Position2D(max.getCol(), pos.getRow());
+        if (pos.getCol() > max.getCol())
+          max = new Position2D(pos.getCol(), max.getRow());
+        if (pos.getRow() < min.getRow())
+          min = new Position2D(min.getCol(), pos.getRow());
+        if (pos.getCol() < min.getCol())
+          min = new Position2D(pos.getCol(), min.getRow());
+      }
+    }
+    int offsetCol = min.getCol();
+    int offsetRow = min.getRow();
+    int colSize = max.getCol() - offsetCol + 1;
+    int rowSize = max.getRow() - offsetRow + 1;
+    String[][] res = new String[colSize][rowSize];
+    for (int i = 0; i < colSize; i++) {
+      for (int j = 0; j < rowSize; j++) {
+        res[i][j] = " ";
+      }
+    }
+    List<Position> intersections = new LinkedList<Position>();
+    for (var entry : this.lineMap.entrySet()) {
+      for (var pos : entry.getValue()) {
+        if (!res[pos.getCol() - offsetCol][pos.getRow() - offsetRow].equals(" ")) {
+          res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = "X";
+          intersections.add(pos);
+        } else
+          res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = entry.getKey();
+      }
+    }
+    // generate detailed intersection list
+    this.intersections = new ArrayList<Intersection>(intersections.size());
+    for (var intPoint : intersections) {
+      var intersection = new Intersection(intPoint);
+      int mapCol = intPoint.getCol() - offsetCol;
+      int mapRow = intPoint.getRow() - offsetRow;
+      // horizontal
+      try {
+        if (res[mapCol - 1][mapRow].equals(res[mapCol + 1][mapRow]) && !res[mapCol - 1][mapRow].equals(" ")) {
+          intersection.horizontal = res[mapCol - 1][mapRow];
+        }
+      } catch (IndexOutOfBoundsException i) {
+      }
+      // vertical
+      try {
+        if (res[mapCol][mapRow - 1].equals(res[mapCol][mapRow + 1]) && !res[mapCol][mapRow - 1].equals(" ")) {
+          intersection.vertical = res[mapCol][mapRow - 1];
+        }
+      } catch (IndexOutOfBoundsException i) {
+      }
+      // backslash
+      try {
+        if (res[mapCol - 1][mapRow - 1].equals(res[mapCol + 1][mapRow + 1])
+            && !res[mapCol - 1][mapRow - 1].equals(" ")) {
+          intersection.backslash = res[mapCol - 1][mapRow - 1];
+        }
+      } catch (IndexOutOfBoundsException i) {
+      }
+      // slash
+      try {
+        if (res[mapCol + 1][mapRow - 1].equals(res[mapCol - 1][mapRow + 1])
+            && !res[mapCol + 1][mapRow - 1].equals(" ")) {
+          intersection.slash = res[mapCol + 1][mapRow - 1];
+        }
+      } catch (IndexOutOfBoundsException i) {
+      }
+      // check for 90deg crossings
+      if (intersection.horizontal != null && intersection.vertical != null) {
+        intersection.isStraight = true;
+      }
+      if (intersection.slash != null && intersection.backslash != null) {
+        intersection.isDiagonal = true;
+      }
+      if (intersection.isStraight || intersection.isDiagonal)
+        this.intersections.add(intersection);
+    }
   }
 
   @Override
