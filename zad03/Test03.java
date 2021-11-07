@@ -113,7 +113,7 @@ public class Test03 {
         "dupa Wydział Przyrodniczy Wadział Fizaki, Astronomii i Informataki Stosowanej xDD aa oadjsod aj alsd jals jasdl jasl djas l lsajd ;lajslaskdjalds ");
     res = dec.getCode().toString();
     if (!res.equals("{}"))
-      throw new Exception("matching occurences, mismatching count pattern test failed: " + resultMap.toString());
+      throw new Exception("matching occurences, mismatching count pattern test failed: " + res);
     testCount++;
 
     // ==== caesar's cipher ROT10 map generation ====
