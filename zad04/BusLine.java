@@ -2,9 +2,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,27 @@ class BusLine implements BusLineInterface {
       return this.secondName;
     }
 
+    @Override
+    public int hashCode() {
+      return Objects.hash(firstName, secondName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      LinesPair other = (LinesPair) obj;
+      return this.firstName.equals(other.firstName) && this.secondName.equals(other.secondName);
+    }
+
+    @Override
+    public String toString() {
+      return "LinesPair (" + firstName + ", " + secondName + ")";
+    }
   }
 
   public class Intersection {
@@ -52,6 +75,22 @@ class BusLine implements BusLineInterface {
     public boolean hasLine(String lineName) {
       return lineName.equals(this.horizontal) || lineName.equals(this.vertical) || lineName.equals(this.slash)
           || lineName.equals(this.backslash);
+    }
+
+    public String intersectsWith(String lineName) {
+      if (this.isStraight) {
+        if (lineName.equals(this.vertical))
+          return this.horizontal;
+        if (lineName.equals(this.horizontal))
+          return this.vertical;
+      }
+      if (this.isDiagonal) {
+        if (lineName.equals(this.slash))
+          return this.backslash;
+        if (lineName.equals(this.backslash))
+          return this.slash;
+      }
+      return null;
     }
   }
 
@@ -398,14 +437,80 @@ class BusLine implements BusLineInterface {
 
   @Override
   public Map<String, List<String>> getIntersectionsWithLines() {
-    // TODO Auto-generated method stub
-    return null;
+    Map<String, List<String>> result = new HashMap<String, List<String>>();
+    // for each line
+    for (var entry : this.lineSegmentMap.entrySet()) {
+      String lineName = entry.getKey();
+      List<List<Position>> posVectors = entry.getValue();
+      // skip lines with no intersections
+      boolean hasIntersections = false;
+      for (var inter : this.intersections) {
+        if (inter.hasLine(lineName)) {
+          hasIntersections = true;
+          break;
+        }
+      }
+      if (!hasIntersections)
+        continue;
+
+      var startPos = this.startMap.get(lineName).getFirstPosition();
+      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
+      List<String> orderedInterSections = new LinkedList<>();
+      while (true) {
+
+        for (var point : vector) {
+          var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
+          // if intersection exists
+          if (interO.isPresent()) {
+            var inter = interO.get();
+            // if the correct line is intersecting
+            if (inter.hasLine(lineName)) {
+              if (inter.intersectsWith(lineName) != null)
+                orderedInterSections.add(inter.intersectsWith(lineName));
+            }
+          }
+        }
+
+        // find next vector
+        Position lastPos = vector.get(vector.size() - 1);
+        var nextV = posVectors.stream().filter(vect -> vect.get(0).equals(lastPos)).findFirst();
+
+        // end of vectors
+        if (nextV.isEmpty())
+          break;
+        // set nextVector as vector
+        vector = nextV.get();
+      }
+
+      result.put(lineName, orderedInterSections);
+    }
+    return result;
   }
 
   @Override
   public Map<BusLineInterface.LinesPair, Set<Position>> getIntersectionOfLinesPair() {
-    // TODO Auto-generated method stub
-    return null;
+    Map<BusLineInterface.LinesPair, Set<Position>> result = new HashMap<BusLineInterface.LinesPair, Set<Position>>();
+    // generate unique line pairs as result keys
+    for (var lineName : this.startMap.keySet()) {
+      for (var lineName2 : this.startMap.keySet()) {
+        // if (lineName.equals(lineName2)) continue; // unless not paired with its own
+        // copy
+        BusLineInterface.LinesPair pair = new LinesPair(lineName, lineName2);
+        result.putIfAbsent(pair, new HashSet<Position>());
+      }
+    }
+    for (var pair : result.keySet()) {
+      System.out.println("asd");
+      // get all intersections
+      List<Intersection> inters = this.intersections.stream()
+          .filter(inter -> pair.getSecondLineName().equals(inter.intersectsWith(pair.getFirstLineName())))
+          .collect(Collectors.toList());
+      // if any are found, map them by positions and transform to set
+      if (inters.size() > 0) {
+        result.put(pair, new HashSet<Position>(inters.stream().map(el -> el.pos).collect(Collectors.toList())));
+      }
+    }
+    return result;
   }
 
   @Override
