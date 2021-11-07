@@ -10,5 +10,6 @@ public class Test04 {
     b.printMap();
     b.findIntersections();
     System.out.println(b.getLines());
+    System.out.println(b.getIntersectionPositions());
   }
 }

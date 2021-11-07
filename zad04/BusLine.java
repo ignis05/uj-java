@@ -194,22 +194,19 @@ class BusLine implements BusLineInterface {
       Collections.reverse(pointList);
 
     // add to point map
-    if (this.lineMap.containsKey(busLineName))
-      this.lineMap.get(busLineName).addAll(pointList);
-    else
-      this.lineMap.put(busLineName, pointList);
+    if (!this.lineMap.containsKey(busLineName))
+      this.lineMap.put(busLineName, new LinkedList<Position>());
+    this.lineMap.get(busLineName).addAll(pointList);
 
     // add to segments
-    if (this.lineSegmentMap.containsKey(busLineName))
-      this.lineSegmentMap.get(busLineName).add(pointList);
-    else
-      this.lineSegmentMap.put(busLineName, new LinkedList<List<Position>>(List.of(pointList)));
+    if (!this.lineSegmentMap.containsKey(busLineName))
+      this.lineSegmentMap.put(busLineName, new LinkedList<List<Position>>());
+    this.lineSegmentMap.get(busLineName).add(pointList);
 
     // add to vector map
-    if (this.lineVectors.containsKey(busLineName))
-      this.lineVectors.get(busLineName).add(lineSegment);
-    else
-      this.lineVectors.put(busLineName, new LinkedList<LineSegment>(List.of(lineSegment)));
+    if (!this.lineVectors.containsKey(busLineName))
+      this.lineVectors.put(busLineName, new LinkedList<LineSegment>());
+    this.lineVectors.get(busLineName).add(lineSegment);
   }
 
   @Override
@@ -318,7 +315,8 @@ class BusLine implements BusLineInterface {
       var startPos = this.startMap.get(lineName).getFirstPosition();
       // var endPos = this.startMap.get(lineName).getLastPosition();
       boolean doneStart = false;
-      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
+      List<Position> vector = new ArrayList<Position>(
+          posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow());
 
       List<Position> orderedPoints = new LinkedList<>();
       while (true) {
@@ -339,7 +337,7 @@ class BusLine implements BusLineInterface {
         if (nextV.isEmpty())
           break;
         // set nextVector as vector
-        vector = nextV.get();
+        vector = new ArrayList<Position>(nextV.get());
       }
 
       result.put(lineName, orderedPoints);
@@ -349,8 +347,53 @@ class BusLine implements BusLineInterface {
 
   @Override
   public Map<String, List<Position>> getIntersectionPositions() {
-    // TODO Auto-generated method stub
-    return null;
+    Map<String, List<Position>> result = new HashMap<String, List<Position>>();
+    // for each line
+    for (var entry : this.lineSegmentMap.entrySet()) {
+      String lineName = entry.getKey();
+      List<List<Position>> posVectors = entry.getValue();
+      // skip lines with no intersections
+      boolean hasIntersections = false;
+      for (var inter : this.intersections) {
+        if (inter.hasLine(lineName)) {
+          hasIntersections = true;
+          break;
+        }
+      }
+      if (!hasIntersections)
+        continue;
+
+      var startPos = this.startMap.get(lineName).getFirstPosition();
+      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
+      List<Position> orderedInterSections = new LinkedList<>();
+      while (true) {
+
+        for (var point : vector) {
+          var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
+          // if intersection exists
+          if (interO.isPresent()) {
+            var inter = interO.get();
+            // if the correct line is intersecting
+            if (inter.hasLine(lineName)) {
+              orderedInterSections.add(point);
+            }
+          }
+        }
+
+        // find next vector
+        Position lastPos = vector.get(vector.size() - 1);
+        var nextV = posVectors.stream().filter(vect -> vect.get(0).equals(lastPos)).findFirst();
+
+        // end of vectors
+        if (nextV.isEmpty())
+          break;
+        // set nextVector as vector
+        vector = nextV.get();
+      }
+
+      result.put(lineName, orderedInterSections);
+    }
+    return result;
   }
 
   @Override
