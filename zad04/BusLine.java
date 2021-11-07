@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +55,13 @@ class BusLine implements BusLineInterface {
     }
   }
 
+  private Map<String, LineSegment> startMap = new HashMap<String, LineSegment>();
+  // raw list of all points for each line
   private Map<String, List<Position>> lineMap = new HashMap<String, List<Position>>();
+  // list of all unpacked vectors
+  private Map<String, List<List<Position>>> lineSegmentMap = new HashMap<String, List<List<Position>>>();
+  // list of LineSegment vectors for each line
+  private Map<String, List<LineSegment>> lineVectors = new HashMap<String, List<LineSegment>>();
   private List<Intersection> intersections;
 
   private List<Position> getPointsFromSegment(LineSegment lineSegment) {
@@ -179,10 +186,30 @@ class BusLine implements BusLineInterface {
 
   @Override
   public void addLineSegment(String busLineName, LineSegment lineSegment) {
+    // generate point list from segment
+    var pointList = this.getPointsFromSegment(lineSegment);
+
+    // flip point list if the order is wrong
+    if (!pointList.get(0).equals(lineSegment.getFirstPosition()))
+      Collections.reverse(pointList);
+
+    // add to point map
     if (this.lineMap.containsKey(busLineName))
-      this.lineMap.get(busLineName).addAll(this.getPointsFromSegment(lineSegment));
+      this.lineMap.get(busLineName).addAll(pointList);
     else
-      this.lineMap.put(busLineName, this.getPointsFromSegment(lineSegment));
+      this.lineMap.put(busLineName, pointList);
+
+    // add to segments
+    if (this.lineSegmentMap.containsKey(busLineName))
+      this.lineSegmentMap.get(busLineName).add(pointList);
+    else
+      this.lineSegmentMap.put(busLineName, new LinkedList<List<Position>>(List.of(pointList)));
+
+    // add to vector map
+    if (this.lineVectors.containsKey(busLineName))
+      this.lineVectors.get(busLineName).add(lineSegment);
+    else
+      this.lineVectors.put(busLineName, new LinkedList<LineSegment>(List.of(lineSegment)));
   }
 
   @Override
@@ -273,9 +300,10 @@ class BusLine implements BusLineInterface {
   @Override
   public Map<String, List<Position>> getLines() {
     Map<String, List<Position>> result = new HashMap<String, List<Position>>();
-    for (var entry : this.lineMap.entrySet()) {
+    // for each line
+    for (var entry : this.lineSegmentMap.entrySet()) {
       String lineName = entry.getKey();
-      List<Position> positions = entry.getValue();
+      List<List<Position>> posVectors = entry.getValue();
       // skip lines with no intersections
       boolean hasIntersections = false;
       for (var inter : this.intersections) {
@@ -286,8 +314,35 @@ class BusLine implements BusLineInterface {
       }
       if (!hasIntersections)
         continue;
-      List<Position> uniquePositions = positions.stream().distinct().collect(Collectors.toList());
-      result.put(lineName, uniquePositions);
+
+      var startPos = this.startMap.get(lineName).getFirstPosition();
+      // var endPos = this.startMap.get(lineName).getLastPosition();
+      boolean doneStart = false;
+      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
+
+      List<Position> orderedPoints = new LinkedList<>();
+      while (true) {
+        Position lastPos = vector.get(vector.size() - 1);
+        // remove first element of each segment except for the first segment
+        if (doneStart) {
+          vector.remove(0);
+        } else {
+          doneStart = true;
+        }
+        // add points to result
+        orderedPoints.addAll(vector);
+
+        // find next vector
+        var nextV = posVectors.stream().filter(vect -> vect.get(0).equals(lastPos)).findFirst();
+
+        // end of vectors
+        if (nextV.isEmpty())
+          break;
+        // set nextVector as vector
+        vector = nextV.get();
+      }
+
+      result.put(lineName, orderedPoints);
     }
     return result;
   }
@@ -312,8 +367,7 @@ class BusLine implements BusLineInterface {
 
   @Override
   public void addBusLine(String busLineName, Position firstPoint, Position lastPoint) {
-    // TODO Auto-generated method stub
-    
+    this.startMap.put(busLineName, new LineSegment(firstPoint, lastPoint));
   }
 
 }
