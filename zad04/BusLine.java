@@ -500,7 +500,6 @@ class BusLine implements BusLineInterface {
       }
     }
     for (var pair : result.keySet()) {
-      System.out.println("asd");
       // get all intersections
       List<Intersection> inters = this.intersections.stream()
           .filter(inter -> pair.getSecondLineName().equals(inter.intersectsWith(pair.getFirstLineName())))
