@@ -23,7 +23,7 @@ public class Test04 {
     b.addLineSegment("c", new LineSegment(new Position2D(8, 2), new Position2D(4, 2)));
 
     b.findIntersections();
-    
+
     // getLines
     Map<String, List<Position>> expLines = new HashMap<String, List<Position>>();
     expLines.put("a", List.of(new Position2D(1, 1), new Position2D(2, 2), new Position2D(3, 3), new Position2D(4, 4),
@@ -58,8 +58,9 @@ public class Test04 {
       errorCount++;
     }
 
-    // getIntersectionsWithLines
+    // getIntersectionOfLinesPair
     Map<BusLine.LinesPair, Set<Position>> expPair = new HashMap<BusLine.LinesPair, Set<Position>>();
+    Map<BusLineInterface.LinesPair, Set<Position>> resPair = b.getIntersectionOfLinesPair();
     expPair.put(b.new LinesPair("b", "a"), new HashSet<Position>(List.of()));
     expPair.put(b.new LinesPair("c", "b"), new HashSet<Position>(List.of()));
     expPair.put(b.new LinesPair("a", "a"), new HashSet<Position>(List.of(new Position2D(4, 4))));
@@ -69,9 +70,23 @@ public class Test04 {
     expPair.put(b.new LinesPair("b", "c"), new HashSet<Position>(List.of()));
     expPair.put(b.new LinesPair("a", "c"), new HashSet<Position>(List.of(new Position2D(7, 2), new Position2D(7, 4))));
     expPair.put(b.new LinesPair("c", "a"), new HashSet<Position>(List.of(new Position2D(7, 2), new Position2D(7, 4))));
-    if (!expPair.equals(b.getIntersectionOfLinesPair())) {
-      System.err.println("error: getIntersectionsWithLines invalid");
+
+    if (expPair.size() != resPair.size()) {
+      System.err.println("error: getIntersectionOfLinesPair invalid");
       errorCount++;
+    } else {
+      for (var expEntry : expPair.entrySet()) {
+        BusLine.LinesPair expLinesPair = expEntry.getKey();
+        var match = resPair.entrySet().stream()
+            .filter(entry -> entry.getKey().getFirstLineName().equals(expLinesPair.getFirstLineName())
+                && entry.getKey().getSecondLineName().equals(expLinesPair.getSecondLineName()))
+            .findFirst();
+        if (match.isEmpty() || !match.get().getValue().equals(expEntry.getValue())) {
+          System.err.println("error: getIntersectionOfLinesPair invalid");
+          errorCount++;
+          break;
+        }
+      }
     }
 
     if (errorCount == 0)
