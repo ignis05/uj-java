@@ -22,6 +22,14 @@ public class Test04 {
     b.addLineSegment("c", new LineSegment(new Position2D(8, 4), new Position2D(8, 2)));
     b.addLineSegment("c", new LineSegment(new Position2D(8, 2), new Position2D(4, 2)));
 
+    b.addBusLine("p1", new Position2D(15, 15), new Position2D(17, 15));
+    b.addBusLine("p2", new Position2D(16, 15), new Position2D(16, 18));
+    b.addLineSegment("p1", new LineSegment(new Position2D(15, 15), new Position2D(15, 20)));
+    b.addLineSegment("p1", new LineSegment(new Position2D(15, 20), new Position2D(17, 20)));
+    b.addLineSegment("p1", new LineSegment(new Position2D(17, 20), new Position2D(17, 15)));
+    b.addLineSegment("p2", new LineSegment(new Position2D(16, 15), new Position2D(16, 16)));
+    b.addLineSegment("p2", new LineSegment(new Position2D(16, 16), new Position2D(16, 18)));
+
     b.findIntersections();
 
     // getLines
@@ -70,6 +78,22 @@ public class Test04 {
     expPair.put(b.new LinesPair("b", "c"), new HashSet<Position>(List.of()));
     expPair.put(b.new LinesPair("a", "c"), new HashSet<Position>(List.of(new Position2D(7, 2), new Position2D(7, 4))));
     expPair.put(b.new LinesPair("c", "a"), new HashSet<Position>(List.of(new Position2D(7, 2), new Position2D(7, 4))));
+    expPair.put(b.new LinesPair("p1", "p1"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p1", "p2"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p1", "a"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p1", "b"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p1", "c"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p2", "p1"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p2", "p2"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p2", "a"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p2", "b"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("p2", "c"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("a", "p1"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("a", "p2"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("b", "p1"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("b", "p2"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("c", "p1"), new HashSet<Position>(List.of()));
+    expPair.put(b.new LinesPair("c", "p2"), new HashSet<Position>(List.of()));
 
     if (expPair.size() != resPair.size()) {
       System.err.println("error: getIntersectionOfLinesPair invalid");

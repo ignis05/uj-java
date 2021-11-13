@@ -269,6 +269,7 @@ class BusLine implements BusLineInterface {
     // generate detailed intersection list
     this.intersections = new ArrayList<Intersection>(intersections.size());
     for (var intPoint : intersections) {
+      var linesInPoint = this.pointMap.get(intPoint);
       var intersection = new Intersection(intPoint);
       int col = intPoint.getCol();
       int row = intPoint.getRow();
@@ -278,6 +279,7 @@ class BusLine implements BusLineInterface {
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
         List<String> common = new ArrayList<String>(this.pointMap.get(p1));
         common.retainAll(this.pointMap.get(p2));
+        common.retainAll(linesInPoint);
         if (common.size() > 0)
           intersection.horizontal = common.get(0);
       }
@@ -286,7 +288,10 @@ class BusLine implements BusLineInterface {
       p2 = new Position2D(col, row - 1);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
         List<String> common = new ArrayList<String>(this.pointMap.get(p1));
-        intersection.vertical = common.get(0);
+        common.retainAll(this.pointMap.get(p2));
+        common.retainAll(linesInPoint);
+        if (common.size() > 0)
+          intersection.vertical = common.get(0);
       }
       // backslash
       p1 = new Position2D(col - 1, row - 1);
@@ -294,28 +299,30 @@ class BusLine implements BusLineInterface {
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
         List<String> common = new ArrayList<String>(this.pointMap.get(p1));
         common.retainAll(this.pointMap.get(p2));
-        intersection.backslash = common.get(0);
+        common.retainAll(linesInPoint);
+        if (common.size() > 0)
+          intersection.backslash = common.get(0);
       }
       // slash
       p1 = new Position2D(col + 1, row - 1);
       p2 = new Position2D(col - 1, row + 1);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
         List<String> common = new ArrayList<String>(this.pointMap.get(p1));
+        common.retainAll(this.pointMap.get(p2));
+        common.retainAll(linesInPoint);
         if (common.size() > 0)
           intersection.slash = common.get(0);
       }
       // check for 90deg crossings
       if (intersection.horizontal != null && intersection.vertical != null) {
         intersection.isStraight = true;
-      }
-      else{
+      } else {
         intersection.horizontal = null;
         intersection.vertical = null;
       }
       if (intersection.slash != null && intersection.backslash != null) {
         intersection.isDiagonal = true;
-      }
-      else{
+      } else {
         intersection.slash = null;
         intersection.backslash = null;
       }
