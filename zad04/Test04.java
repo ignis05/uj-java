@@ -22,6 +22,7 @@ public class Test04 {
     b.addLineSegment("c", new LineSegment(new Position2D(8, 4), new Position2D(8, 2)));
     b.addLineSegment("c", new LineSegment(new Position2D(8, 2), new Position2D(4, 2)));
 
+    // p1 wrapping around p2 - no intersections should be found there
     b.addBusLine("p1", new Position2D(15, 15), new Position2D(17, 15));
     b.addBusLine("p2", new Position2D(16, 15), new Position2D(16, 18));
     b.addLineSegment("p1", new LineSegment(new Position2D(15, 15), new Position2D(15, 20)));
