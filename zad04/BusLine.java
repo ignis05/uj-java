@@ -276,44 +276,48 @@ class BusLine implements BusLineInterface {
       var p1 = new Position2D(col + 1, row);
       var p2 = new Position2D(col - 1, row);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
-        var line1 = this.pointMap.get(p1).get(0);
-        var line2 = this.pointMap.get(p2).get(0);
-        if (line1.equals(line2))
-          intersection.horizontal = line1;
+        List<String> common = new ArrayList<String>(this.pointMap.get(p1));
+        common.retainAll(this.pointMap.get(p2));
+        if (common.size() > 0)
+          intersection.horizontal = common.get(0);
       }
       // vertical
       p1 = new Position2D(col, row + 1);
       p2 = new Position2D(col, row - 1);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
-        var line1 = this.pointMap.get(p1).get(0);
-        var line2 = this.pointMap.get(p2).get(0);
-        if (line1.equals(line2))
-          intersection.vertical = line1;
+        List<String> common = new ArrayList<String>(this.pointMap.get(p1));
+        intersection.vertical = common.get(0);
       }
       // backslash
       p1 = new Position2D(col - 1, row - 1);
       p2 = new Position2D(col + 1, row + 1);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
-        var line1 = this.pointMap.get(p1).get(0);
-        var line2 = this.pointMap.get(p2).get(0);
-        if (line1.equals(line2))
-          intersection.backslash = line1;
+        List<String> common = new ArrayList<String>(this.pointMap.get(p1));
+        common.retainAll(this.pointMap.get(p2));
+        intersection.backslash = common.get(0);
       }
       // slash
       p1 = new Position2D(col + 1, row - 1);
       p2 = new Position2D(col - 1, row + 1);
       if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
-        var line1 = this.pointMap.get(p1).get(0);
-        var line2 = this.pointMap.get(p2).get(0);
-        if (line1.equals(line2))
-          intersection.slash = line1;
+        List<String> common = new ArrayList<String>(this.pointMap.get(p1));
+        if (common.size() > 0)
+          intersection.slash = common.get(0);
       }
       // check for 90deg crossings
       if (intersection.horizontal != null && intersection.vertical != null) {
         intersection.isStraight = true;
       }
+      else{
+        intersection.horizontal = null;
+        intersection.vertical = null;
+      }
       if (intersection.slash != null && intersection.backslash != null) {
         intersection.isDiagonal = true;
+      }
+      else{
+        intersection.slash = null;
+        intersection.backslash = null;
       }
       if (intersection.isStraight || intersection.isDiagonal)
         this.intersections.add(intersection);
