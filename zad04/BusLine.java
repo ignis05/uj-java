@@ -97,6 +97,8 @@ class BusLine implements BusLineInterface {
   private Map<String, LineSegment> startMap = new HashMap<String, LineSegment>();
   // raw list of all points for each line
   private Map<String, List<Position>> lineMap = new HashMap<String, List<Position>>();
+  // raw list of all points for each line
+  private Map<Position, List<String>> pointMap = new HashMap<Position, List<String>>();
   // list of all unpacked vectors
   private Map<String, List<List<Position>>> lineSegmentMap = new HashMap<String, List<List<Position>>>();
   // list of LineSegment vectors for each line
@@ -246,80 +248,65 @@ class BusLine implements BusLineInterface {
     if (!this.lineVectors.containsKey(busLineName))
       this.lineVectors.put(busLineName, new LinkedList<LineSegment>());
     this.lineVectors.get(busLineName).add(lineSegment);
+
+    for (var point : pointList) {
+      if (!this.pointMap.containsKey(point)) {
+        this.pointMap.put(point, new LinkedList<String>());
+      }
+      this.pointMap.get(point).add(busLineName);
+    }
   }
 
   @Override
   public void findIntersections() {
-    // render 2d map
-    var min = this.lineMap.entrySet().iterator().next().getValue().get(0);
-    var max = new Position2D(min.getCol(), min.getRow());
-    for (var entry : this.lineMap.entrySet()) {
-      for (var pos : entry.getValue()) {
-        if (pos.getRow() > max.getRow())
-          max = new Position2D(max.getCol(), pos.getRow());
-        if (pos.getCol() > max.getCol())
-          max = new Position2D(pos.getCol(), max.getRow());
-        if (pos.getRow() < min.getRow())
-          min = new Position2D(min.getCol(), pos.getRow());
-        if (pos.getCol() < min.getCol())
-          min = new Position2D(pos.getCol(), min.getRow());
-      }
-    }
-    int offsetCol = min.getCol();
-    int offsetRow = min.getRow();
-    int colSize = max.getCol() - offsetCol + 1;
-    int rowSize = max.getRow() - offsetRow + 1;
-    String[][] res = new String[colSize][rowSize];
-    for (int i = 0; i < colSize; i++) {
-      for (int j = 0; j < rowSize; j++) {
-        res[i][j] = " ";
-      }
-    }
+    // list of all points suspected of being an intersection
     List<Position> intersections = new LinkedList<Position>();
-    for (var entry : this.lineMap.entrySet()) {
-      for (var pos : entry.getValue()) {
-        if (!res[pos.getCol() - offsetCol][pos.getRow() - offsetRow].equals(" ")) {
-          res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = "X";
-          intersections.add(pos);
-        } else
-          res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = entry.getKey();
+    for (var entry : this.pointMap.entrySet()) {
+      if (entry.getValue().size() > 1) {
+        intersections.add(entry.getKey());
       }
     }
     // generate detailed intersection list
     this.intersections = new ArrayList<Intersection>(intersections.size());
     for (var intPoint : intersections) {
       var intersection = new Intersection(intPoint);
-      int mapCol = intPoint.getCol() - offsetCol;
-      int mapRow = intPoint.getRow() - offsetRow;
+      int col = intPoint.getCol();
+      int row = intPoint.getRow();
       // horizontal
-      try {
-        if (res[mapCol - 1][mapRow].equals(res[mapCol + 1][mapRow]) && !res[mapCol - 1][mapRow].equals(" ")) {
-          intersection.horizontal = res[mapCol - 1][mapRow];
-        }
-      } catch (IndexOutOfBoundsException i) {
+      var p1 = new Position2D(col + 1, row);
+      var p2 = new Position2D(col - 1, row);
+      if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
+        var line1 = this.pointMap.get(p1).get(0);
+        var line2 = this.pointMap.get(p2).get(0);
+        if (line1.equals(line2))
+          intersection.horizontal = line1;
       }
       // vertical
-      try {
-        if (res[mapCol][mapRow - 1].equals(res[mapCol][mapRow + 1]) && !res[mapCol][mapRow - 1].equals(" ")) {
-          intersection.vertical = res[mapCol][mapRow - 1];
-        }
-      } catch (IndexOutOfBoundsException i) {
+      p1 = new Position2D(col, row + 1);
+      p2 = new Position2D(col, row - 1);
+      if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
+        var line1 = this.pointMap.get(p1).get(0);
+        var line2 = this.pointMap.get(p2).get(0);
+        if (line1.equals(line2))
+          intersection.vertical = line1;
       }
       // backslash
-      try {
-        if (res[mapCol - 1][mapRow - 1].equals(res[mapCol + 1][mapRow + 1])
-            && !res[mapCol - 1][mapRow - 1].equals(" ")) {
-          intersection.backslash = res[mapCol - 1][mapRow - 1];
-        }
-      } catch (IndexOutOfBoundsException i) {
+      p1 = new Position2D(col - 1, row - 1);
+      p2 = new Position2D(col + 1, row + 1);
+      if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
+        var line1 = this.pointMap.get(p1).get(0);
+        var line2 = this.pointMap.get(p2).get(0);
+        if (line1.equals(line2))
+          intersection.backslash = line1;
       }
       // slash
-      try {
-        if (res[mapCol + 1][mapRow - 1].equals(res[mapCol - 1][mapRow + 1])
-            && !res[mapCol + 1][mapRow - 1].equals(" ")) {
-          intersection.slash = res[mapCol + 1][mapRow - 1];
-        }
-      } catch (IndexOutOfBoundsException i) {
+      p1 = new Position2D(col + 1, row - 1);
+      p2 = new Position2D(col - 1, row + 1);
+      if (this.pointMap.containsKey(p1) && this.pointMap.containsKey(p2)) {
+        var line1 = this.pointMap.get(p1).get(0);
+        var line2 = this.pointMap.get(p2).get(0);
+        if (line1.equals(line2))
+          intersection.slash = line1;
       }
       // check for 90deg crossings
       if (intersection.horizontal != null && intersection.vertical != null) {
