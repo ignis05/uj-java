@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 class BusLine implements BusLineInterface {
 
-  public class LinesPair implements BusLineInterface.LinesPair {
+  public static class LinesPair implements BusLineInterface.LinesPair {
     private String firstName;
     private String secondName;
 
