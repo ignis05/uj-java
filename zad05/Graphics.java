@@ -2,6 +2,39 @@ import java.util.LinkedList;
 
 class Graphics implements GraphicsInterface {
 
+  /** Position Constructor for returning new Positions */
+  private static class Position2 implements Position {
+    int row;
+    int col;
+
+    public Position2(int row, int col) {
+      this.row = row;
+      this.col = col;
+    }
+
+    @Override
+    public int getRow() {
+      return row;
+    }
+
+    @Override
+    public int getCol() {
+      return col;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      Position2 other = (Position2) obj;
+      return col == other.col && row == other.row;
+    }
+  }
+
   private static enum Directions {
     UP(-1, 0), DOWN(1, 0), LEFT(0, -1), RIGHT(0, 1);
 
@@ -11,28 +44,6 @@ class Graphics implements GraphicsInterface {
     Directions(int vertical, int horizontal) {
       this.vertical = vertical;
       this.horizontal = horizontal;
-    }
-
-    /** Position Constructor for returning new Positions */
-    private static class Position2 implements Position {
-      int row;
-      int col;
-
-      public Position2(int row, int col) {
-        this.row = row;
-        this.col = col;
-      }
-
-      @Override
-      public int getRow() {
-        return row;
-      }
-
-      @Override
-      public int getCol() {
-        return col;
-      }
-
     }
 
     /**
@@ -61,6 +72,12 @@ class Graphics implements GraphicsInterface {
   public void fillWithColor(Position startingPosition, Color color)
       throws GraphicsInterface.WrongStartingPosition, GraphicsInterface.NoCanvasException {
 
+    if (this.canvas == null) {
+      throw new GraphicsInterface.NoCanvasException();
+    }
+
+    boolean isFistPoint = true;
+
     var paintedPoints = new LinkedList<Position>();
     var pointQueue = new LinkedList<Position>();
     pointQueue.add(startingPosition);
@@ -75,6 +92,8 @@ class Graphics implements GraphicsInterface {
       }
       // border end
       catch (CanvasInterface.CanvasBorderException ex) {
+        if (isFistPoint)
+          throw new GraphicsInterface.WrongStartingPosition();
         continue;
       }
       // painted over other color
@@ -86,22 +105,17 @@ class Graphics implements GraphicsInterface {
         }
         continue;
       }
+      if (isFistPoint)
+        isFistPoint = false;
 
       // move in 4 directions
       for (var dir : Directions.values()) {
         var nextPoint = dir.getNextPosition(point);
         // but only if point hasn't been visited and isn't in a queue
-        if (!paintedPoints.contains(nextPoint) && !pointQueue.contains(nextPoint)) {
+        if (!paintedPoints.contains((Position2) nextPoint) && !pointQueue.contains((Position2) nextPoint)) {
           pointQueue.add(nextPoint);
         }
       }
     }
   }
-
-  public static void main(String[] args)
-      throws GraphicsInterface.WrongStartingPosition, GraphicsInterface.NoCanvasException {
-    var xd = new Graphics();
-    xd.fillWithColor(null, null);
-  }
-
 }
