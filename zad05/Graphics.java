@@ -101,8 +101,10 @@ class Graphics implements GraphicsInterface {
         try {
           this.canvas.setColor(point, ex.previousColor);
         } catch (Exception ex2) {
-          // will throw BorderColorException again but that doesnt matter
+          // may throw BorderColorException again but that doesnt matter
         }
+        if (isFistPoint)
+          throw new GraphicsInterface.WrongStartingPosition();
         continue;
       }
       if (isFistPoint)
