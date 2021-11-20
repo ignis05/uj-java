@@ -97,7 +97,7 @@ public class Test05 {
     }
     System.out.println("test 1 " + (threwEx ? "passed" : "failed"));
 
-    // test 2 - invalid pos
+    // test 2 - invalid pos (out of canvas)
     threwEx = false;
     gp.setCanvas(canvas);
     try {
@@ -107,7 +107,25 @@ public class Test05 {
     }
     System.out.println("test 2 " + (threwEx ? "passed" : "failed"));
 
-    // test 3
+    // test 3 - invalid pos (in border)
+    threwEx = false;
+    gp.setCanvas(canvas);
+    try {
+      gp.fillWithColor(new Position2(1, 1), Color.GREEN);
+    } catch (GraphicsInterface.WrongStartingPosition ex) {
+      var sb = new StringBuilder();
+      for (int i = 0; i < canvas.array.length; i++) {
+        for (int j = 0; j < canvas.array[0].length; j++) {
+          sb.append(canvas.array[i][j]);
+        }
+        sb.append("\n");
+      }
+      String expectedStr = "WRRWRWRWWW\nWRRRRWRWWW\nWRWWWWWRWW\nWRWWWWWWRW\nRWWWWWWWRW\nWRWWWWWWRW\nRWWWWWWWRW\nWRRRWWRRWW\nWWWWRRWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\n";
+      threwEx = expectedStr.equals(sb.toString());
+    }
+    System.out.println("test 3 " + (threwEx ? "passed" : "failed"));
+
+    // test 4
     gp.fillWithColor(new Position2(5, 5), Color.GREEN);
     var sb = new StringBuilder();
     for (int i = 0; i < canvas.array.length; i++) {
@@ -118,6 +136,6 @@ public class Test05 {
     }
     // System.out.println(sb.toString());
     String expectedStr = "WRRWRGRWWW\nWRRRRGRWWW\nWRGGGGGRWW\nWRGGGGGGRW\nRGGGGGGGRW\nWRGGGGGGRW\nRGGGGGGGRW\nWRRRGGRRWW\nWWWWRRWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\nWWWWWWWWWW\n";
-    System.out.println("test 3 " + (expectedStr.equals(sb.toString()) ? "passed" : "failed"));
+    System.out.println("test 4 " + (expectedStr.equals(sb.toString()) ? "passed" : "failed"));
   }
 }
