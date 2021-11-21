@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class BusLine implements BusLineInterface {
+class TestExtractor implements BusLineInterface {
 
   public static class LinesPair implements BusLineInterface.LinesPair {
     private String firstName;
@@ -103,9 +103,6 @@ class BusLine implements BusLineInterface {
   private Map<String, List<List<Position>>> lineSegmentMap = new HashMap<String, List<List<Position>>>();
   // list of LineSegment vectors for each line
   private Map<String, List<LineSegment>> lineVectors = new HashMap<String, List<LineSegment>>();
-  // orderedPoints
-  private Map<String, List<Position>> orderedPointMap = new HashMap<String, List<Position>>();
-
   private List<Intersection> intersections;
 
   private List<Position> getPointsFromSegment(LineSegment lineSegment) {
@@ -209,8 +206,7 @@ class BusLine implements BusLineInterface {
     }
     for (var entry : this.lineMap.entrySet()) {
       for (var pos : entry.getValue()) {
-        if (!res[pos.getCol() - offsetCol][pos.getRow() - offsetRow].equals(" ")
-            && !res[pos.getCol() - offsetCol][pos.getRow() - offsetRow].equals(entry.getKey()))
+        if (!res[pos.getCol() - offsetCol][pos.getRow() - offsetRow].equals(" "))
           res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = "X";
         else
           res[pos.getCol() - offsetCol][pos.getRow() - offsetRow] = entry.getKey();
@@ -263,6 +259,7 @@ class BusLine implements BusLineInterface {
 
   @Override
   public void findIntersections() {
+
     // list of all points suspected of being an intersection
     List<Position> intersections = new LinkedList<Position>();
     for (var entry : this.pointMap.entrySet()) {
@@ -333,9 +330,11 @@ class BusLine implements BusLineInterface {
       if (intersection.isStraight || intersection.isDiagonal)
         this.intersections.add(intersection);
     }
+  }
 
-    // generate orderedPointMap
-    orderedPointMap = new HashMap<String, List<Position>>();
+  @Override
+  public Map<String, List<Position>> getLines() {
+    Map<String, List<Position>> result = new HashMap<String, List<Position>>();
     // for each line
     for (var entry : this.lineSegmentMap.entrySet()) {
       String lineName = entry.getKey();
@@ -379,22 +378,21 @@ class BusLine implements BusLineInterface {
         vector = new ArrayList<Position>(nextV.get());
       }
 
-      orderedPointMap.put(lineName, orderedPoints);
+      result.put(lineName, orderedPoints);
     }
-  }
-
-  @Override
-  public Map<String, List<Position>> getLines() {
-    return this.orderedPointMap;
+    return result;
   }
 
   @Override
   public Map<String, List<Position>> getIntersectionPositions() {
+     if (this.lineVectors.size() > 0)
+      throw new RuntimeException(this.startMap.toString());
+
     Map<String, List<Position>> result = new HashMap<String, List<Position>>();
     // for each line
-    for (var entry : this.orderedPointMap.entrySet()) {
+    for (var entry : this.lineSegmentMap.entrySet()) {
       String lineName = entry.getKey();
-
+      List<List<Position>> posVectors = entry.getValue();
       // skip lines with no intersections
       boolean hasIntersections = false;
       for (var inter : this.intersections) {
@@ -406,18 +404,32 @@ class BusLine implements BusLineInterface {
       if (!hasIntersections)
         continue;
 
+      var startPos = this.startMap.get(lineName).getFirstPosition();
+      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
       List<Position> orderedInterSections = new LinkedList<>();
+      while (true) {
 
-      for (var point : entry.getValue()) {
-        var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
-        // if intersection exists
-        if (interO.isPresent()) {
-          var inter = interO.get();
-          // if the correct line is intersecting
-          if (inter.hasLine(lineName)) {
-            orderedInterSections.add(point);
+        for (var point : vector) {
+          var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
+          // if intersection exists
+          if (interO.isPresent()) {
+            var inter = interO.get();
+            // if the correct line is intersecting
+            if (inter.hasLine(lineName)) {
+              orderedInterSections.add(point);
+            }
           }
         }
+
+        // find next vector
+        Position lastPos = vector.get(vector.size() - 1);
+        var nextV = posVectors.stream().filter(vect -> vect.get(0).equals(lastPos)).findFirst();
+
+        // end of vectors
+        if (nextV.isEmpty())
+          break;
+        // set nextVector as vector
+        vector = nextV.get();
       }
 
       result.put(lineName, orderedInterSections);
@@ -429,8 +441,9 @@ class BusLine implements BusLineInterface {
   public Map<String, List<String>> getIntersectionsWithLines() {
     Map<String, List<String>> result = new HashMap<String, List<String>>();
     // for each line
-    for (var entry : this.orderedPointMap.entrySet()) {
+    for (var entry : this.lineSegmentMap.entrySet()) {
       String lineName = entry.getKey();
+      List<List<Position>> posVectors = entry.getValue();
       // skip lines with no intersections
       boolean hasIntersections = false;
       for (var inter : this.intersections) {
@@ -442,19 +455,33 @@ class BusLine implements BusLineInterface {
       if (!hasIntersections)
         continue;
 
+      var startPos = this.startMap.get(lineName).getFirstPosition();
+      var vector = posVectors.stream().filter(vect -> vect.get(0).equals(startPos)).findFirst().orElseThrow();
       List<String> orderedInterSections = new LinkedList<>();
+      while (true) {
 
-      for (var point : entry.getValue()) {
-        var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
-        // if intersection exists
-        if (interO.isPresent()) {
-          var inter = interO.get();
-          // if the correct line is intersecting
-          if (inter.hasLine(lineName)) {
-            if (inter.intersectsWith(lineName) != null)
-              orderedInterSections.add(inter.intersectsWith(lineName));
+        for (var point : vector) {
+          var interO = this.intersections.stream().filter(el -> el.pos.equals(point)).findFirst();
+          // if intersection exists
+          if (interO.isPresent()) {
+            var inter = interO.get();
+            // if the correct line is intersecting
+            if (inter.hasLine(lineName)) {
+              if (inter.intersectsWith(lineName) != null)
+                orderedInterSections.add(inter.intersectsWith(lineName));
+            }
           }
         }
+
+        // find next vector
+        Position lastPos = vector.get(vector.size() - 1);
+        var nextV = posVectors.stream().filter(vect -> vect.get(0).equals(lastPos)).findFirst();
+
+        // end of vectors
+        if (nextV.isEmpty())
+          break;
+        // set nextVector as vector
+        vector = nextV.get();
       }
 
       result.put(lineName, orderedInterSections);
