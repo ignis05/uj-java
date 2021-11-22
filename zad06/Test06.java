@@ -51,30 +51,31 @@ public class Test06 {
     comp.compress();
     String outSequence = outputSequence(comp, inpSequence.split(" ").length);
     Map<String, String> header = comp.getHeader();
-    System.out.println("test 01 " + ("0 0 0 1010 1111 1011 0 0 1110 1000 0 0 0 0".equals(outSequence) ? "passed" : "failed"));
+    System.out.println(("0 0 0 1010 1111 1011 0 0 1110 1000 0 0 0 0".equals(outSequence) ? "passed" : "failed") + " test 01 - oramus1");
 
-    // test 02 - oramus przyklad 2
+    // test 02 - oramus przyklad 2 - decompression
     comp = new Compression();
     inpSequence = "000 001 000 001 000 001 000 001 011 001 000 110 001 000 111 001 001 000 000 000 001";
     inputSequence(inpSequence, comp);
     comp.compress();
     outSequence = outputSequence(comp, inpSequence.split(" ").length);
     header = comp.getHeader();
-    System.out.println("test 02 - valid output " + (inpSequence.equals(decompressSequence(header, outSequence)) ? "passed" : "failed"));
+    System.out.println((inpSequence.equals(decompressSequence(header, outSequence)) ? "passed" : "failed") + " test 02 - oramus2 - decompression");
 
+    // test 03 - optimal compression
     int resLength = getSequenceLenght(outSequence) + getHeaderLength(header);
     int expLength = getSequenceLenght("00 01 00 01 00 01 00 01 1011 01 00 1110 01 00 1111 01 01 00 00 00 01") + 10;
     if (resLength != expLength)
-      System.out.println("test 02 - optimal compression failed - resultLength:" + resLength + ", optimal:" + expLength);
+      System.out.println("failed test 03 - oramus2 - optimal compression | resultLength:" + resLength + ", optimal:" + expLength);
     else
-      System.out.println("test 02 - optimal compression passed");
+      System.out.println("passed test 03 - oramus2 - optimal compression ");
 
-    // test 03 - unable to compress
+    // test 04 - impossible compression
     comp = new Compression();
     inpSequence = "00 01 10 11";
     inputSequence(inpSequence, comp);
     comp.compress();
     header = comp.getHeader();
-    System.out.println("test 03 " + (header.size() == 0 ? "passed" : "failed"));
+    System.out.println((header.size() == 0 ? "passed" : "failed") + " test 04 - impossible compression");
   }
 }
