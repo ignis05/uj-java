@@ -62,7 +62,7 @@ public class Test06 {
     header = comp.getHeader();
     System.out.println((inpSequence.equals(decompressSequence(header, outSequence)) ? "passed" : "failed") + " test 02 - oramus2 - decompression");
 
-    // test 03 - optimal compression
+    // test 03 - oramus przyklad 2 - optimal compression
     int resLength = getSequenceLenght(outSequence) + getHeaderLength(header);
     int expLength = getSequenceLenght("00 01 00 01 00 01 00 01 1011 01 00 1110 01 00 1111 01 01 00 00 00 01") + 10;
     if (resLength != expLength)
@@ -77,5 +77,24 @@ public class Test06 {
     comp.compress();
     header = comp.getHeader();
     System.out.println((header.size() == 0 ? "passed" : "failed") + " test 04 - impossible compression");
+
+    // test 05 - random test 1 - decompression
+    comp = new Compression();
+    inpSequence = "0101 0101 0101 0101 0101 0101 0101 0101 0101 0101 0011 0011 0011 0011 0011 0011 0011 0011 0011 0011 0001 0001 0001 0001 0001 0001 0001 0001 0001 0001 0111 1000 0100 0111 0001 1000 1000 1001 0101 1000 1001 1001 0000 0010 0000 0101 0101 0100 0011 0100";
+    inputSequence(inpSequence, comp);
+    comp.compress();
+    header = comp.getHeader();
+    outSequence = outputSequence(comp, inpSequence.split(" ").length);
+    System.out.println((inpSequence.equals(decompressSequence(header, outSequence)) ? "passed" : "failed") + " test 05 - random test 1 - decompression");
+
+    // test 06 - oramus przyklad 2 - optimal compression
+    resLength = getSequenceLenght(outSequence) + getHeaderLength(header);
+    expLength = getSequenceLenght(
+        "00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 01 01 01 10 10 10 10 10 10 10 10 10 10 10111 11000 10100 10111 10 11000 11000 11001 00 11000 11001 11001 10000 10010 10000 00 00 10100 01 10100")
+        + 18;
+    if (resLength != expLength)
+      System.out.println("failed test 06 - random test 1 - optimal compression | resultLength:" + resLength + ", optimal:" + expLength);
+    else
+      System.out.println("passed test 06 - random test 1 - optimal compression ");
   }
 }
