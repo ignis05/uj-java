@@ -45,8 +45,7 @@ class Compression implements CompressionInterface {
     // map {key=word val=count}
     Map<String, Long> counts = this.words.stream().collect(Collectors.groupingBy(el -> el, Collectors.counting()));
     // set of words that repeat more than once
-    var repeatedSet = (counts.entrySet().stream().filter(entry -> entry.getValue() > 1)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))).keySet();
+    var repeatedSet = (counts.entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))).keySet();
 
     // refs to optimal header and wordlist
     Map<String, String> optimalHeader = null;
@@ -70,18 +69,20 @@ class Compression implements CompressionInterface {
       var entry1 = header.entrySet().iterator().next();
       int headerSize = (entry1.getKey().length() + entry1.getValue().length()) * header.size();
 
-      var compWords = new ArrayList<String>(this.words);
-      for (int i = 0; i < compWords.size(); i++)
-        compWords.set(i, "1" + compWords.get(i));
+      // unshift "1" to all words
+      List<String> compWords = new ArrayList<String>(this.words).stream().map(el -> "1" + el).collect(Collectors.toList());
 
+      // replace all words chosen for compression
       for (var el : header.entrySet())
         Collections.replaceAll(compWords, "1" + el.getValue(), el.getKey());
 
       var wordsSize = compWords.stream().mapToInt(String::length).sum();
 
+      // if new result is smaller, set it as optimal
       if (headerSize + wordsSize < minSize) {
         optimalHeader = header;
         optimalWords = compWords;
+        minSize = headerSize + wordsSize;
       }
     }
 
