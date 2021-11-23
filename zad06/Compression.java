@@ -34,6 +34,14 @@ class Compression implements CompressionInterface {
     return sets;
   }
 
+  private static int getBitSize(int k) {
+    var c = Integer.toBinaryString(k).length();
+    if (Integer.toBinaryString((int) Math.pow(2, c) | (k - 1)).substring(1).toCharArray()[0] == '1') {
+      c++;
+    }
+    return c;
+  }
+
   @Override
   public void addWord(String word) {
     this.words.add(word);
@@ -61,7 +69,7 @@ class Compression implements CompressionInterface {
 
       // create compression header
       Map<String, String> header = new HashMap<String, String>();
-      int codeSize = Integer.toBinaryString(set.size()).length();
+      int codeSize = getBitSize(set.size());
       var binCounter = 0;
       for (var word : set) {
         header.put(Integer.toBinaryString((int) Math.pow(2, codeSize) | binCounter++).substring(1), word);

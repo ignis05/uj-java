@@ -90,8 +90,8 @@ public class Test06 {
     // test 06 - oramus przyklad 2 - optimal compression
     resLength = getSequenceLenght(outSequence) + getHeaderLength(header);
     expLength = getSequenceLenght(
-        "00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 01 01 01 10 10 10 10 10 10 10 10 10 10 10111 11000 10100 10111 10 11000 11000 11001 00 11000 11001 11001 10000 10010 10000 00 00 10100 01 10100")
-        + 18;
+        "00 00 00 00 00 00 00 00 00 00 01 01 01 01 01 01 01 01 01 01 10001 10001 10001 10001 10001 10001 10001 10001 10001 10001 10111 11000 10100 10111 10001 11000 11000 11001 00 11000 11001 11001 10000 10010 10000 00 00 10100 01 10100")
+        + 12;
     if (resLength != expLength)
       System.out.println("failed test 06 - random test 1 - optimal compression | resultLength:" + resLength + ", optimal:" + expLength);
     else
