@@ -1,12 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 class Compression implements CompressionInterface {
@@ -14,25 +12,6 @@ class Compression implements CompressionInterface {
   private Map<String, String> header = new HashMap<String, String>(0);
   private List<String> compressedWords = null;
   private Iterator<String> compressedIterator = null;
-
-  private static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-    Set<Set<T>> sets = new HashSet<Set<T>>();
-    if (originalSet.isEmpty()) {
-      sets.add(new HashSet<T>());
-      return sets;
-    }
-    List<T> list = new ArrayList<T>(originalSet);
-    T head = list.get(0);
-    Set<T> rest = new HashSet<T>(list.subList(1, list.size()));
-    for (Set<T> set : powerSet(rest)) {
-      Set<T> newSet = new HashSet<T>();
-      newSet.add(head);
-      newSet.addAll(set);
-      sets.add(newSet);
-      sets.add(set);
-    }
-    return sets;
-  }
 
   private static int getBitSize(int k) {
     var c = Integer.toBinaryString(k).length();
@@ -53,7 +32,11 @@ class Compression implements CompressionInterface {
     // map {key=word val=count}
     Map<String, Long> counts = this.words.stream().collect(Collectors.groupingBy(el -> el, Collectors.counting()));
     // set of words that repeat more than once
-    var repeatedSet = (counts.entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))).keySet();
+    var repeatedList = new ArrayList<String>(
+        (counts.entrySet().stream().filter(entry -> entry.getValue() > 1).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))).keySet());
+
+    // sorted from most occurences to least
+    Collections.sort(repeatedList, (a, b) -> counts.get(b).compareTo(counts.get(a)));
 
     // refs to optimal header and wordlist
     Map<String, String> optimalHeader = null;
@@ -62,16 +45,16 @@ class Compression implements CompressionInterface {
     // minSize = uncompressed length
     int minSize = this.words.get(0).length() * this.words.size();
 
-    // interate through powerset for every combination
-    for (var set : powerSet(repeatedSet)) {
-      if (set.isEmpty())
-        continue;
+    // keep adding words to compression from most occurences to least
+    List<String> words2Compress = new LinkedList<String>();
+    for (var newWord : repeatedList) {
+      words2Compress.add(newWord);
 
       // create compression header
       Map<String, String> header = new HashMap<String, String>();
-      int codeSize = getBitSize(set.size());
+      int codeSize = getBitSize(words2Compress.size());
       var binCounter = 0;
-      for (var word : set) {
+      for (var word : words2Compress) {
         header.put(Integer.toBinaryString((int) Math.pow(2, codeSize) | binCounter++).substring(1), word);
       }
       var entry1 = header.entrySet().iterator().next();
