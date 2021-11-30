@@ -1,6 +1,4 @@
-
 class ParallelSearcher implements ParallelSearcherInterface {
-
   class BoxOpener extends Thread {
     @Override
     public void run() {
