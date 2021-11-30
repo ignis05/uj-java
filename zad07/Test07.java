@@ -116,7 +116,7 @@ public class Test07 {
   public static void main(String[] args) {
     List<List<Double>> hpsValues = new ArrayList<List<Double>>(testSize);
     for (int i = 0; i < testSize; i++) {
-      int boxCount = 5 + random.nextInt(16);
+      int boxCount = 8 + random.nextInt(13);
       List<Double> innerValues = new ArrayList<Double>(boxCount + 1);
       innerValues.add((double) (3 + random.nextInt(5)));
       for (int j = 0; j < boxCount; j++) {
