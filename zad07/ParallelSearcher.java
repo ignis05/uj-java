@@ -40,9 +40,7 @@ class ParallelSearcher implements ParallelSearcherInterface {
 
   @Override
   public void set(HidingPlaceSupplierSupplier HPSSupplier) {
-    int counter = 0;
     while ((supplier = HPSSupplier.get(totalValue)) != null) {
-      System.out.println("=== Retrieved new HPS (" + counter++ + ") ===");
       // reset value
       totalValue = 0.;
       // launch searching threads
@@ -63,5 +61,4 @@ class ParallelSearcher implements ParallelSearcherInterface {
       }
     }
   }
-
 }

@@ -12,19 +12,19 @@ public class Test07 {
     private AtomicInteger detectedThreads = new AtomicInteger(0);
     private AtomicInteger maxDetThreads = new AtomicInteger(0);
     private int threads;
-    private List<Integer> values;
+    private List<Double> values;
     private Integer i = 0;
 
-    public HPS(List<Integer> values) {
-      this.threads = values.remove(0);
+    public HPS(List<Double> values) {
+      this.threads = (int) ((double) (values.remove(0)));
       this.values = values;
     }
 
     class HP implements HidingPlace {
-      private int value;
-      private boolean isOpened = false;
+      private double value;
+      private volatile boolean isOpened = false;
 
-      public HP(int value) {
+      public HP(double value) {
         this.value = value;
       }
 
@@ -84,10 +84,11 @@ public class Test07 {
   }
 
   public static class HPSS implements HidingPlaceSupplierSupplier {
-    List<List<Integer>> hpsValues;
+    List<List<Double>> hpsValues;
     double expValue = 0;
+    volatile int counter = 0;
 
-    HPSS(List<List<Integer>> hpsValues) {
+    HPSS(List<List<Double>> hpsValues) {
       this.hpsValues = hpsValues;
     }
 
@@ -98,10 +99,11 @@ public class Test07 {
     @Override
     public HidingPlaceSupplier get(double totalValueOfPreviousObject) {
       if (totalValueOfPreviousObject == expValue) {
+        System.out.println("Requested new valid HPS (" + counter++ + ") by requesting value " + expValue);
         if (hpsValues.size() == 0)
           return null;
         var hpValues = hpsValues.remove(0);
-        expValue = hpValues.stream().mapToInt(Integer::intValue).sum() - hpValues.get(0); // subtract thread count
+        expValue = hpValues.stream().mapToDouble(Double::doubleValue).sum() - hpValues.get(0); // subtract thread count
         return new HPS(hpValues);
       } else
         throw new RuntimeException("Invalid totalValueOfPreviousObject:\nExpected: " + expValue + ", Received: " + totalValueOfPreviousObject);
@@ -109,13 +111,29 @@ public class Test07 {
 
   }
 
+  final static int testSize = 10;
+
   public static void main(String[] args) {
-    List<List<Integer>> hpsValues = new ArrayList<List<Integer>>(2);
-    hpsValues.add(new ArrayList<Integer>(List.of(3, 5, 0, 4, 0, 1, 0, 0)));
-    hpsValues.add(new ArrayList<Integer>(List.of(4, 0, 2, 0, 0, 0, 0, 0, 1, 3, 7)));
+    List<List<Double>> hpsValues = new ArrayList<List<Double>>(testSize);
+    for (int i = 0; i < testSize; i++) {
+      int boxCount = 5 + random.nextInt(16);
+      List<Double> innerValues = new ArrayList<Double>(boxCount + 1);
+      innerValues.add((double) (3 + random.nextInt(5)));
+      for (int j = 0; j < boxCount; j++) {
+        // weighted for more zeros
+        if (random.nextInt(10) < 3)
+          innerValues.add(0.);
+        else
+          innerValues.add((double) (1 + random.nextInt(30)));
+      }
+      hpsValues.add(innerValues);
+    }
     var hpss = new HPSS(hpsValues);
     var searcher = new ParallelSearcher();
     searcher.set(hpss);
-    System.out.println(hpss.isEmpty());
+    if (hpss.isEmpty())
+      System.out.println("Succesfully emptied HPSS");
+    else
+      System.out.println("Failed to empty HPSS");
   }
 }
