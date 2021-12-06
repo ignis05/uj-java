@@ -5,10 +5,10 @@ import java.util.Map;
 public class Test08 {
 
   static class Client extends Thread {
-    Shop shop;
-    String productName;
-    int quantity;
-    public Boolean expResult = null;
+    public Shop shop;
+    public String productName;
+    public int quantity;
+    public Boolean result = null;
 
     public Client(Shop shop, String productName, int quantity) {
       this.shop = shop;
@@ -22,7 +22,7 @@ public class Test08 {
         Thread.sleep(100);
       } catch (InterruptedException e) {
       }
-      var result = shop.purchase(productName, quantity);
+      result = shop.purchase(productName, quantity);
       System.out.println(Thread.currentThread().getName() + (result ? " purchased " : " failed to purchase ") + quantity + " " + productName);
     }
   }
@@ -61,11 +61,24 @@ public class Test08 {
     for (var th : threadList)
       th.join();
 
-    // results
+    // ===== results =====
     System.out.println("\n=== results ===");
+
+    // check threads that failed to buy
+    Client failed = null;
+    for (var th : threadList)
+      if (!th.result) {
+        if (failed != null)
+          throw new RuntimeException("More clients failed purchase than expected");
+        failed = th;
+      }
+    if (!failed.productName.equals("product1"))
+      throw new RuntimeException("Wrong client failed to purchase");
+    System.out.println("Correct client failed to purchase");
+
+    // check if stock is as expected
     if (!shop.stock().toString().equals("{product2=0, product1=2, product4=4, product3=21}"))
-      System.out.println("Invalid result stock");
-    else
-      System.out.println("Test complete - stock equals expected stock");
+      throw new RuntimeException("Invalid result stock");
+    System.out.println("Stock equals expected stock");
   }
 }
