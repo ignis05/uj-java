@@ -2,50 +2,84 @@ import java.util.HashMap;
 import java.util.Map;
 
 class Shop implements ShopInterface {
-  private Map<String, Integer> stock = new HashMap<String, Integer>();
+  private volatile Map<String, Integer> stock = new HashMap<String, Integer>();
+  private volatile Map<String, Object> latches = new HashMap<String, Object>();
 
-  @Override
-  public void delivery(Map<String, Integer> goods) {
-    synchronized (this.stock) {
-      for (var item : goods.entrySet()) {
-        String key = item.getKey();
-        Integer value = item.getValue();
-        if (this.stock.containsKey(item.getKey()))
-          this.stock.put(key, this.stock.get(key) + value);
-        else
-          this.stock.put(key, value);
-
-        System.out.println("Added " + value + " " + key + " to stock");
-        synchronized (key) {
-          key.notifyAll();
+  private void unlockThreads(String key) {
+    synchronized (latches) {
+      if (latches.containsKey(key)) {
+        var latch = latches.get(key);
+        synchronized (latch) {
+          latch.notifyAll();
         }
       }
     }
   }
 
+  private Object getLatch(String key) {
+    synchronized (latches) {
+      if (latches.containsKey(key)) {
+        return latches.get(key);
+      }
+
+      Object o = new Object();
+      latches.put(key, o);
+      return o;
+    }
+  }
+
   @Override
-  public boolean purchase(String productName, int quantity) {
-    System.out.println(Thread.currentThread().getName() + " is attempting to purchase " + quantity + " " + productName);
+  public void delivery(Map<String, Integer> goods) {
+
+    for (var item : goods.entrySet()) {
+      String key = item.getKey();
+      Integer value = item.getValue();
+
+      // update stock
+      synchronized (this.stock) {
+        synchronized (getLatch(key)) {
+          if (this.stock.containsKey(item.getKey()))
+            this.stock.put(key, this.stock.get(key) + value);
+          else
+            this.stock.put(key, value);
+        }
+      }
+      System.out.println("Added " + value + " " + key + " to stock");
+
+      // unlock threads
+      unlockThreads(key);
+
+    }
+  }
+
+  @Override
+  public boolean purchase(String key, int quantity) {
+    System.out.println(Thread.currentThread().getName() + " is attempting to purchase " + quantity + " " + key);
     boolean firstTry = true;
-    synchronized (productName) {
+    var latch = getLatch(key);
+    synchronized (latch) {
       while (true) {
-        // if there is enough stock
-        if (quantity <= this.stock.get(productName)) {
-          this.stock.put(productName, this.stock.get(productName) - quantity);
-          return true;
-        }
-        // if failed to buy in the first try, wait and try agaim
-        if (firstTry) {
-          System.out.println(Thread.currentThread().getName() + " failed 1st attempt to purchase " + quantity + " " + productName + "- waiting for delivery");
-          firstTry = false;
-          try {
-            productName.wait();
-          } catch (InterruptedException e) {
+        // key exists
+        if (this.stock.containsKey(key)) {
+          var val = this.stock.get(key);
+          // can buy
+          if (val >= quantity) {
+            this.stock.put(key, val - quantity);
+            return true;
           }
-          System.out.println(Thread.currentThread().getName() + " notified about delivery of " + productName);
-          continue;
         }
-        return false;
+
+        // not first try
+        if (!firstTry)
+          return false;
+
+        firstTry = false;
+
+        try {
+          latch.wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
     }
   }
