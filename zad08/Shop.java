@@ -15,36 +15,37 @@ class Shop implements ShopInterface {
         else
           this.stock.put(key, value);
 
-        stock.get(key).notifyAll();
+        System.out.println("Added " + value + " " + key + " to stock");
+        synchronized (key) {
+          key.notifyAll();
+        }
       }
     }
   }
 
   @Override
   public boolean purchase(String productName, int quantity) {
+    System.out.println(Thread.currentThread().getName() + " is attempting to purchase " + quantity + " " + productName);
     boolean firstTry = true;
-    synchronized (this.stock) {
+    synchronized (productName) {
       while (true) {
-        // if stock contains key
-        if (this.stock.containsKey(productName)) {
-          var value = this.stock.get(productName);
-          // if there is enough stock
-          if (value <= quantity) {
-            value -= quantity;
-            return true;
+        // if there is enough stock
+        if (quantity <= this.stock.get(productName)) {
+          this.stock.put(productName, this.stock.get(productName) - quantity);
+          return true;
+        }
+        // if failed to buy in the first try, wait and try agaim
+        if (firstTry) {
+          System.out.println(Thread.currentThread().getName() + " failed 1st attempt to purchase " + quantity + " " + productName + "- waiting for delivery");
+          firstTry = false;
+          try {
+            productName.wait();
+          } catch (InterruptedException e) {
           }
-          // if failed to buy in the first try, wait and try agaim
-          if (firstTry) {
-            firstTry = false;
-            try {
-              value.wait();
-            } catch (InterruptedException e) {
-            }
-            continue;
-          }
-          return false;
-        } else // if stock doesnt contain key - ???
-          return false;
+          System.out.println(Thread.currentThread().getName() + " notified about delivery of " + productName);
+          continue;
+        }
+        return false;
       }
     }
   }
