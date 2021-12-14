@@ -153,21 +153,31 @@ class GraphDrawer extends JPanel {
     Graphics2D g2d = (Graphics2D) g;
     int width = this.getWidth();
     int height = this.getHeight();
-    g2d.setColor(new Color(0, 0, 0));
 
     System.out.println(width);
     System.out.println(height);
     graph.scaleNodes(width, height);
 
-    int pointSize = 10;
-    for (var node : graph.nodes) {
-      // System.out.println("Drawing " + node);
-      // System.out.println("at x=" + node.x + ", y=" + node.y);
-      g2d.drawOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
-      // g2d.drawString(node.getCordsStr(), node.x, node.y);
+    // draw edges
+    g2d.setColor(new Color(0, 0, 0));
+    for (var edge : graph.edges) {
+      var node1 = graph.nodes[edge.node1 - 1];
+      var node2 = graph.nodes[edge.node2 - 1];
+      g2d.setStroke(new BasicStroke(3));
+      g2d.drawLine(node1.x, node1.y, node2.x, node2.y);
     }
 
-
+    // draw nodes
+    g2d.setStroke(new BasicStroke(3));
+    int pointSize = 10;
+    for (var node : graph.nodes) {
+      // System.out.println("Drawing " + node + "\nat x=" + node.x + ", y=" + node.y);
+      g2d.setColor(new Color(255, 255, 255));
+      g2d.fillOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
+      g2d.setColor(new Color(0, 0, 0));
+      g2d.drawOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
+      // g2d.drawString(node.getCordsStr(), node.x - 5, node.y - 10);
+    }
   }
 }
 
