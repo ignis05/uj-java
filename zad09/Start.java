@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 class Graph {
   public static class Edge {
@@ -28,10 +31,29 @@ class Graph {
   public static class Node {
     public int column;
     public int row;
+    public int x;
+    public int y;
 
     public Node(int column, int row) {
       this.column = column;
       this.row = row;
+    }
+
+    public int getColumn() {
+      return column;
+    }
+
+    public int getRow() {
+      return column;
+    }
+
+    public String getCordsStr() {
+      return "[" + column + "," + row + "]";
+    }
+
+    @Override
+    public String toString() {
+      return this.getClass().getName() + getCordsStr();
     }
 
     public static Node fromString(String str) {
@@ -42,6 +64,18 @@ class Graph {
 
   public Node[] nodes;
   public Edge[] edges;
+
+  public void scaleNodes(int canvasWidth, int canvasHeight) {
+    int colCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
+    int rowCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
+    float xTick = (canvasWidth - 50) / (colCount - 1);
+    float yTick = (canvasHeight - 50) / (rowCount - 1);
+
+    for (var node : nodes) {
+      node.x = 25 + Math.round((node.column - 1) * xTick);
+      node.y = canvasHeight - (25 + Math.round((node.row - 1) * yTick));
+    }
+  }
 }
 
 class Header extends JPanel {
@@ -85,7 +119,7 @@ class Header extends JPanel {
   public Header(GraphDrawer gd) {
     this.gd = gd;
 
-    picker = new JFileChooser();
+    picker = new JFileChooser(Paths.get("").toAbsolutePath().toFile());
 
     button = new JButton("Load");
     button.addActionListener(new ActionListener() {
@@ -101,8 +135,11 @@ class Header extends JPanel {
 }
 
 class GraphDrawer extends JPanel {
+  Graph graph;
+
   public void drawGraph(Graph graph) {
     System.out.println("drawing graph");
+    this.graph = graph;
     this.repaint();
   }
 
@@ -110,11 +147,27 @@ class GraphDrawer extends JPanel {
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
 
+    if (this.graph == null)
+      return;
+
     Graphics2D g2d = (Graphics2D) g;
+    int width = this.getWidth();
+    int height = this.getHeight();
+    g2d.setColor(new Color(0, 0, 0));
 
-    g2d.setColor(new Color(50, 50, 50));
+    System.out.println(width);
+    System.out.println(height);
+    graph.scaleNodes(width, height);
 
-    g2d.drawOval(50, 50, 50, 50);
+    int pointSize = 10;
+    for (var node : graph.nodes) {
+      // System.out.println("Drawing " + node);
+      // System.out.println("at x=" + node.x + ", y=" + node.y);
+      g2d.drawOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
+      // g2d.drawString(node.getCordsStr(), node.x, node.y);
+    }
+
+
   }
 }
 
@@ -126,6 +179,7 @@ class Window {
     window.setSize(500, 500);
 
     var gd = new GraphDrawer();
+    gd.setBorder(BorderFactory.createLineBorder(Color.black));
     window.getContentPane().add(BorderLayout.CENTER, gd);
 
     var header = new Header(gd);
