@@ -15,11 +15,16 @@ class Graph {
     public int node1;
     public int node2;
     public int weight;
+    public int stroke;
 
     public Edge(int node1, int node2, int weight) {
       this.node1 = node1;
       this.node2 = node2;
       this.weight = weight;
+    }
+
+    public int getWeight() {
+      return weight;
     }
 
     public static Edge fromString(String str) {
@@ -65,7 +70,8 @@ class Graph {
   public Node[] nodes;
   public Edge[] edges;
 
-  public void scaleNodes(int canvasWidth, int canvasHeight) {
+  public void scaleGraph(int canvasWidth, int canvasHeight) {
+    // scale nodes
     int colCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
     int rowCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
     float xTick = (canvasWidth - 50) / (colCount - 1);
@@ -74,6 +80,12 @@ class Graph {
     for (var node : nodes) {
       node.x = 25 + Math.round((node.column - 1) * xTick);
       node.y = canvasHeight - (25 + Math.round((node.row - 1) * yTick));
+    }
+
+    // scale edges
+    int minWeight = Arrays.stream(edges).min(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
+    for (var edge : edges) {
+      edge.stroke = Math.round(edge.weight / minWeight) * 3;
     }
   }
 }
@@ -154,16 +166,15 @@ class GraphDrawer extends JPanel {
     int width = this.getWidth();
     int height = this.getHeight();
 
-    System.out.println(width);
-    System.out.println(height);
-    graph.scaleNodes(width, height);
+    graph.scaleGraph(width, height);
 
     // draw edges
     g2d.setColor(new Color(0, 0, 0));
     for (var edge : graph.edges) {
       var node1 = graph.nodes[edge.node1 - 1];
       var node2 = graph.nodes[edge.node2 - 1];
-      g2d.setStroke(new BasicStroke(3));
+      System.out.println("drawing edge weighted " + edge.weight + " with stroke " + edge.stroke);
+      g2d.setStroke(new BasicStroke(edge.stroke));
       g2d.drawLine(node1.x, node1.y, node2.x, node2.y);
     }
 
