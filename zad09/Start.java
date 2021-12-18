@@ -181,14 +181,12 @@ class GraphDrawer extends JPanel {
     for (var edge : graph.edges) {
       var node1 = graph.nodes[edge.node1 - 1];
       var node2 = graph.nodes[edge.node2 - 1];
-      // System.out.println("drawing edge weighted " + edge.weight + " with stroke " + edge.stroke);
       g2d.setStroke(new BasicStroke(edge.stroke));
       g2d.drawLine(node1.x, node1.y, node2.x, node2.y);
     }
 
     // draw nodes
     for (var node : graph.nodes) {
-      // System.out.println(node.stroke);
       g2d.setStroke(new BasicStroke(node.stroke / 2));
       g2d.setColor(new Color(255, 255, 255));
       g2d.fillOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
