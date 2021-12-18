@@ -93,7 +93,7 @@ class Graph {
     // scale edges
     int minWeight = Arrays.stream(edges).min(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
     for (var edge : edges) {
-      edge.stroke = Math.round(edge.weight / minWeight) * (smallerDimention / 100);
+      edge.stroke = Math.round((edge.weight / minWeight) * (smallerDimention / 100));
     }
   }
 }
@@ -173,6 +173,10 @@ class GraphDrawer extends JPanel {
     Graphics2D g2d = (Graphics2D) g;
     int width = this.getWidth();
     int height = this.getHeight();
+
+    RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+    g2d.setRenderingHints(rh);
 
     graph.scaleGraph(width, height);
 
