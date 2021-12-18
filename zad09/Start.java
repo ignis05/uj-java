@@ -72,14 +72,16 @@ class Graph {
 
   public void scaleGraph(int canvasWidth, int canvasHeight) {
     // scale nodes
-    int colCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
-    int rowCount = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
-    float xTick = (canvasWidth - 50) / (colCount - 1);
-    float yTick = (canvasHeight - 50) / (rowCount - 1);
+    int minCol = Arrays.stream(nodes).min(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
+    int maxCol = Arrays.stream(nodes).max(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
+    int minRow = Arrays.stream(nodes).min(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
+    int maxRow = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
+    float xTick = (canvasWidth - 50) / (maxCol - minCol);
+    float yTick = (canvasHeight - 50) / (maxRow - minRow);
 
     for (var node : nodes) {
-      node.x = 25 + Math.round((node.column - 1) * xTick);
-      node.y = canvasHeight - (25 + Math.round((node.row - 1) * yTick));
+      node.x = 25 + Math.round((node.column - minCol) * xTick);
+      node.y = canvasHeight - (25 + Math.round((node.row - minRow) * yTick));
     }
 
     // scale edges
