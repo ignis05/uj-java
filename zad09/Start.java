@@ -38,6 +38,7 @@ class Graph {
     public int row;
     public int x;
     public int y;
+    public int stroke;
 
     public Node(int column, int row) {
       this.column = column;
@@ -71,23 +72,28 @@ class Graph {
   public Edge[] edges;
 
   public void scaleGraph(int canvasWidth, int canvasHeight) {
+    int smallerDimention = canvasWidth < canvasHeight ? canvasWidth : canvasHeight;
+
     // scale nodes
     int minCol = Arrays.stream(nodes).min(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
     int maxCol = Arrays.stream(nodes).max(Comparator.comparing(Node::getColumn)).orElseThrow(NoSuchElementException::new).column;
     int minRow = Arrays.stream(nodes).min(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
     int maxRow = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
-    float xTick = (canvasWidth - 50) / (maxCol - minCol);
-    float yTick = (canvasHeight - 50) / (maxRow - minRow);
+    double xOffset = canvasWidth * 0.1;
+    double yOffset = canvasHeight * 0.1;
+    double xTick = (canvasWidth - xOffset) / (maxCol - minCol);
+    double yTick = (canvasHeight - yOffset) / (maxRow - minRow);
 
     for (var node : nodes) {
-      node.x = 25 + Math.round((node.column - minCol) * xTick);
-      node.y = canvasHeight - (25 + Math.round((node.row - minRow) * yTick));
+      node.x = (int) Math.round((xOffset / 2) + ((node.column - minCol) * xTick));
+      node.y = canvasHeight - (int) (Math.round((yOffset / 2) + (node.row - minRow) * yTick));
+      node.stroke = 1 + Math.round(smallerDimention / 25);
     }
 
     // scale edges
     int minWeight = Arrays.stream(edges).min(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
     for (var edge : edges) {
-      edge.stroke = Math.round(edge.weight / minWeight) * 3;
+      edge.stroke = Math.round(edge.weight / minWeight) * (smallerDimention / 100);
     }
   }
 }
@@ -175,20 +181,19 @@ class GraphDrawer extends JPanel {
     for (var edge : graph.edges) {
       var node1 = graph.nodes[edge.node1 - 1];
       var node2 = graph.nodes[edge.node2 - 1];
-      System.out.println("drawing edge weighted " + edge.weight + " with stroke " + edge.stroke);
+      // System.out.println("drawing edge weighted " + edge.weight + " with stroke " + edge.stroke);
       g2d.setStroke(new BasicStroke(edge.stroke));
       g2d.drawLine(node1.x, node1.y, node2.x, node2.y);
     }
 
     // draw nodes
-    g2d.setStroke(new BasicStroke(3));
-    int pointSize = 10;
     for (var node : graph.nodes) {
-      // System.out.println("Drawing " + node + "\nat x=" + node.x + ", y=" + node.y);
+      // System.out.println(node.stroke);
+      g2d.setStroke(new BasicStroke(node.stroke / 2));
       g2d.setColor(new Color(255, 255, 255));
-      g2d.fillOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
+      g2d.fillOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
       g2d.setColor(new Color(0, 0, 0));
-      g2d.drawOval(node.x - (pointSize / 2), node.y - (pointSize / 2), pointSize, pointSize);
+      g2d.drawOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
       // g2d.drawString(node.getCordsStr(), node.x - 5, node.y - 10);
     }
   }
