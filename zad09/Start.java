@@ -100,9 +100,10 @@ class Graph {
     }
 
     // scale edges
-    int minWeight = Arrays.stream(edges).min(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
+    int maxWeight = Arrays.stream(edges).max(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
     for (var edge : edges) {
-      edge.stroke = Math.round((edge.weight / minWeight) * (smallerDimention / 200));
+      double strokeMultiplier = ((double) edge.weight) / ((double) maxWeight);
+      edge.stroke = (int) Math.round(strokeMultiplier * (smallerDimention / 25));
     }
   }
 }
