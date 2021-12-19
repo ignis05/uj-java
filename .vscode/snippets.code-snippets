@@ -18,7 +18,7 @@
 	"System out printline": {
 		"scope": "java",
 		"prefix": "clg",
-		"body": ["System.out.println(\"$1\");"],
+		"body": ["System.out.println($1);"],
 		"description": "Log output to console"
 	}
 }
