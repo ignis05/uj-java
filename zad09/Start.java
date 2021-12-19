@@ -102,7 +102,7 @@ class Graph {
     // scale edges
     int minWeight = Arrays.stream(edges).min(Comparator.comparing(Edge::getWeight)).orElseThrow(NoSuchElementException::new).weight;
     for (var edge : edges) {
-      edge.stroke = Math.round((edge.weight / minWeight) * (smallerDimention / 100));
+      edge.stroke = Math.round((edge.weight / minWeight) * (smallerDimention / 200));
     }
   }
 }
@@ -165,6 +165,11 @@ class Header extends JPanel {
 
 class GraphDrawer extends JPanel {
   Graph graph;
+  boolean debugdraw = false;
+
+  public void setDebugDraw(boolean debugdraw) {
+    this.debugdraw = debugdraw;
+  }
 
   public void drawGraph(Graph graph) {
     System.out.println("drawing graph");
@@ -190,12 +195,16 @@ class GraphDrawer extends JPanel {
     graph.scaleGraph(width, height);
 
     // draw edges
-    g2d.setColor(new Color(0, 0, 0));
     for (var edge : graph.edges) {
       var node1 = graph.nodes[edge.node1 - 1];
       var node2 = graph.nodes[edge.node2 - 1];
+      g2d.setColor(new Color(0, 0, 0));
       g2d.setStroke(new BasicStroke(edge.stroke));
       g2d.drawLine(node1.x, node1.y, node2.x, node2.y);
+      if (debugdraw) {
+        g2d.setColor(new Color(255, 0, 0));
+        g2d.drawString("w=" + edge.weight + ",s=" + edge.stroke + "px", (node1.x + node2.x) / 2, (node1.y + node2.y) / 2);
+      }
     }
 
     // draw nodes
@@ -205,8 +214,10 @@ class GraphDrawer extends JPanel {
       g2d.fillOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
       g2d.setColor(new Color(0, 0, 0));
       g2d.drawOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
-      g2d.setColor(new Color(255, 0, 0));
-      // g2d.drawString(node.getCordsStr(), node.x, node.y);
+      if (debugdraw) {
+        g2d.setColor(new Color(255, 0, 0));
+        g2d.drawString(node.getCordsStr(), node.x, node.y);
+      }
     }
   }
 }
@@ -214,12 +225,13 @@ class GraphDrawer extends JPanel {
 class Window {
   private JFrame window;
 
-  public Window() {
+  public Window(boolean debugdraw) {
     window = new JFrame("window");
     window.setSize(500, 500);
 
     var gd = new GraphDrawer();
     gd.setBorder(BorderFactory.createLineBorder(Color.black));
+    gd.setDebugDraw(debugdraw);
     window.getContentPane().add(BorderLayout.CENTER, gd);
 
     var header = new Header(gd);
@@ -234,7 +246,7 @@ class Window {
 
 class Start {
   public static void main(String[] args) {
-    var window = new Window();
+    var window = new Window(false);
     window.show();
   }
 }
