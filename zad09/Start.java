@@ -50,7 +50,7 @@ class Graph {
     }
 
     public int getRow() {
-      return column;
+      return row;
     }
 
     public String getCordsStr() {
@@ -81,12 +81,20 @@ class Graph {
     int maxRow = Arrays.stream(nodes).max(Comparator.comparing(Node::getRow)).orElseThrow(NoSuchElementException::new).row;
     double xOffset = canvasWidth * 0.1;
     double yOffset = canvasHeight * 0.1;
-    double xTick = (canvasWidth - xOffset) / (maxCol - minCol);
-    double yTick = (canvasHeight - yOffset) / (maxRow - minRow);
+    int colCount = Math.abs(maxCol - minCol);
+    int rowCount = Math.abs(maxRow - minRow);
+    double xTick = (canvasWidth - xOffset) / colCount;
+    double yTick = (canvasHeight - yOffset) / rowCount;
+    if (xTick > yTick)
+      xTick = yTick;
+    if (yTick > xTick)
+      yTick = xTick;
+    double xMargin = (canvasWidth - (xTick * colCount)) / 2;
+    double yMargin = (canvasHeight - (yTick * rowCount)) / 2;
 
     for (var node : nodes) {
-      node.x = (int) Math.round((xOffset / 2) + ((node.column - minCol) * xTick));
-      node.y = canvasHeight - (int) (Math.round((yOffset / 2) + (node.row - minRow) * yTick));
+      node.x = (int) Math.round(xMargin + (Math.abs(node.column - minCol) * xTick));
+      node.y = canvasHeight - (int) (Math.round(yMargin + Math.abs(node.row - minRow) * yTick));
       node.stroke = 1 + Math.round(smallerDimention / 25);
     }
 
@@ -196,7 +204,8 @@ class GraphDrawer extends JPanel {
       g2d.fillOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
       g2d.setColor(new Color(0, 0, 0));
       g2d.drawOval(node.x - (node.stroke / 2), node.y - (node.stroke / 2), node.stroke, node.stroke);
-      // g2d.drawString(node.getCordsStr(), node.x - 5, node.y - 10);
+      g2d.setColor(new Color(255, 0, 0));
+      // g2d.drawString(node.getCordsStr(), node.x, node.y);
     }
   }
 }
