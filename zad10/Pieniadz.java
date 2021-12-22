@@ -3,9 +3,9 @@ public class Pieniadz {
 	private final Nominal nominal;
 	private final Rozmienialnosc rozmienialnosc;
 	private final int numer;
-	private int licznik;
+	private static int licznik;
 
-	private Pieniadz(Nominal nominal, Rozmienialnosc rozmienialnosc) {
+	public Pieniadz(Nominal nominal, Rozmienialnosc rozmienialnosc) {
 		this.nominal = nominal;
 		this.rozmienialnosc = rozmienialnosc;
 		numer = licznik++;
