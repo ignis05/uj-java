@@ -23,6 +23,11 @@ class Rozmieniacz implements RozmieniaczInterface {
     return pieniadze.stream().map(Pieniadz::numerSeryjny).collect(Collectors.toList());
   }
 
+  // same as below but automatic mapping Pieniadz::numerSeryjny
+  public void serialNumberCheck2(List<Pieniadz> serials, List<Pieniadz> anyExtraSerials) {
+    serialNumberCheck(MapPtoSN(serials), MapPtoSN(anyExtraSerials));
+  }
+
   /**
    * Checks list of serial numbers for duplicates and also against second list and
    * internal list.
@@ -89,7 +94,7 @@ public class Test10 {
     // System.out.println("kasa: " + kasa);
 
     // test results
-    r.serialNumberCheck(Rozmieniacz.MapPtoSN(kasa), Rozmieniacz.MapPtoSN(reszta));
+    r.serialNumberCheck2(kasa, reszta);
     if (reszta.stream().mapToInt(Pieniadz::wartosc).sum() != 1)
       throw new RuntimeException("Nieprawidlowa reszta");
     if (kasa.stream().mapToInt(Pieniadz::wartosc).sum() != 69)
