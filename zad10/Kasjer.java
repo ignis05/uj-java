@@ -10,6 +10,23 @@ class Kasjer implements KasjerInterface {
   private RozmieniaczInterface rozmieniacz;
 
   /**
+   * Puts coins in register and sorts them
+   * 
+   * @param rozm
+   * @param nRozm
+   */
+  private void putCoinsInRegister(List<Pieniadz> rozm, List<Pieniadz> nRozm) {
+    if (rozm != null) {
+      rozmKasa.addAll(rozm);
+      Collections.sort(rozmKasa, (p1, p2) -> p1.wartosc() - p2.wartosc());
+    }
+    if (nRozm != null) {
+      nRozmKasa.addAll(nRozm);
+      Collections.sort(nRozmKasa, (p1, p2) -> p1.wartosc() - p2.wartosc());
+    }
+  }
+
+  /**
    * Returns coins with specified total value from the register
    * 
    * @param value
@@ -74,9 +91,8 @@ class Kasjer implements KasjerInterface {
     int normalSum = normal.stream().mapToInt(Pieniadz::wartosc).sum();
     int pieniadzeSum = pieniadze.stream().mapToInt(Pieniadz::wartosc).sum();
     int doWydania = pieniadzeSum - cena;
-    // * clear pieniadze list do prevent money duping - from now operate only on
-    // * 'normal' and 'nRozm' lists
-    pieniadze.clear();
+    // clear pieniandze to prevent accidental duping
+    pieniadze = new ArrayList<Pieniadz>(0);
 
     // result list
     List<Pieniadz> reszta = new ArrayList<Pieniadz>(doWydania);
@@ -85,7 +101,7 @@ class Kasjer implements KasjerInterface {
     if (doWydania == 0)
       return reszta;
 
-    // nRozm must be used
+    // wydanie reszty z logicznym rozmienieniem nrozm
     if (doWydania > normalSum) {
       // get smallest nRozm
       var coin = nRozm.remove(0);
@@ -93,7 +109,9 @@ class Kasjer implements KasjerInterface {
       var registerCoins = this.getCoinsFromRegister(coin.wartosc() - doWydania);
       reszta.add(coin); // nRozm moneta
       reszta.addAll(registerCoins); // reszta z kasy
-    } else {
+    }
+    // can normally give out change
+    else {
       // reduce doWydania when adding money to result list
       while (doWydania > 0) {
         // remove coin from pool
@@ -104,10 +122,13 @@ class Kasjer implements KasjerInterface {
           doWydania -= coin.wartosc();
         } else {
           // exchange and add coins back to front of the pool
-          pieniadze.addAll(0, rozmieniacz.rozmien(coin));
+          normal.addAll(0, rozmieniacz.rozmien(coin));
         }
       }
     }
+
+    // add the rest of coins to the register
+    this.putCoinsInRegister(normal, nRozm);
 
     return reszta;
   }
