@@ -98,35 +98,33 @@ class Kasjer implements KasjerInterface {
     List<Pieniadz> reszta = new ArrayList<Pieniadz>(doWydania);
 
     // paid with exact money - no rest
-    if (doWydania == 0)
-      return reszta;
-
-    // wydanie reszty z logicznym rozmienieniem nrozm
-    if (doWydania > normalSum) {
-      // get smallest nRozm
-      var coin = nRozm.remove(0);
-      // coins pulled from the register
-      var registerCoins = this.getCoinsFromRegister(coin.wartosc() - doWydania);
-      reszta.add(coin); // nRozm moneta
-      reszta.addAll(registerCoins); // reszta z kasy
-    }
-    // can normally give out change
-    else {
-      // reduce doWydania when adding money to result list
-      while (doWydania > 0) {
-        // remove coin from pool
-        var coin = normal.remove(0);
-        if (coin.wartosc() <= doWydania) {
-          // put coin in result
-          reszta.add(coin);
-          doWydania -= coin.wartosc();
-        } else {
-          // exchange and add coins back to front of the pool
-          normal.addAll(0, rozmieniacz.rozmien(coin));
+    if (doWydania != 0) {
+      // wydanie reszty z logicznym rozmienieniem nrozm
+      if (doWydania > normalSum) {
+        // get smallest nRozm
+        var coin = nRozm.remove(0);
+        // coins pulled from the register
+        var registerCoins = this.getCoinsFromRegister(doWydania);
+        reszta.add(coin); // nRozm moneta
+        reszta.addAll(registerCoins); // reszta z kasy
+      }
+      // can normally give out change
+      else {
+        // reduce doWydania when adding money to result list
+        while (doWydania > 0) {
+          // remove coin from pool
+          var coin = normal.remove(0);
+          if (coin.wartosc() <= doWydania) {
+            // put coin in result
+            reszta.add(coin);
+            doWydania -= coin.wartosc();
+          } else {
+            // exchange and add coins back to front of the pool
+            normal.addAll(0, rozmieniacz.rozmien(coin));
+          }
         }
       }
     }
-
     // add the rest of coins to the register
     this.putCoinsInRegister(normal, nRozm);
 
