@@ -76,6 +76,12 @@ class Rozmieniacz implements RozmieniaczInterface {
     if (serialNumbers.contains(coin.numerSeryjny()))
       throw new RuntimeException("Serial number " + coin.numerSeryjny() + " appeared twice - money was duped");
 
+    if (coin.wartosc() == 1)
+      throw new RuntimeException("Spróbowano rozmienić pieniądz ZŁ1");
+
+    if (!coin.czyMozeBycRozmieniony())
+      throw new RuntimeException("Spróbowano rozmienić pieniądz nierozmienialny");
+
     List<Pieniadz> result = new LinkedList<Pieniadz>();
 
     int bound = nominaly.indexOf(coin.wartosc());
