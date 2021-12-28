@@ -91,7 +91,7 @@ class Rozmieniacz implements RozmieniaczInterface {
     while (remainingValue > 0) {
       int index = rand.nextInt(bound);
       int val = nominaly.get(index);
-      // if nominal to high, set it as limit for next random
+      // if nominal too high, set it as limit for next random
       if (val > remainingValue) {
         bound = index;
       } else {
