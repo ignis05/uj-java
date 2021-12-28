@@ -202,6 +202,21 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
+    // test 7: w kasie sa 3złR i 5złNR, trzeba wydać 5zł
+    k = new Kasjer();
+    k.dostępDoRozmieniacza(r);
+    k.dostępDoPoczątkowegoStanuKasy(
+        new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł1, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł2, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE) }));
+    reszta = k.rozlicz(5, List.of(new Pieniadz(Nominal.Zł10, Rozmienialnosc.NIE)));
+    kasa = k.stanKasy();
+    if (reszta.stream().mapToInt(Pieniadz::wartosc).sum() != 10 + 5)
+      throw new RuntimeException("Nieprawidlowa suma reszty");
+    if (!reszta.containsAll(List.of(new Pieniadz(Nominal.Zł10, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE))))
+      throw new RuntimeException("W reszcie nie ma oczekiwanych monet NR");
+    if (kasa.stream().mapToInt(Pieniadz::wartosc).sum() != 3)
+      throw new RuntimeException("Nieprawidlowa kasa");
+    r.serialNumberCheck2(kasa, reszta);
+
     System.out.println("All tests passed");
   }
 }
