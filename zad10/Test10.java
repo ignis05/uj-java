@@ -223,7 +223,7 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
-    // test 8: test na wyjebanie optymalizacji zachłannej wydawania NR
+    // test 8: test na wyjebanie zachłannego wydawania NR od największych
     k = new Kasjer();
     k.dostępDoRozmieniacza(r);
     k.dostępDoPoczątkowegoStanuKasy(new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE),
@@ -235,6 +235,20 @@ public class Test10 {
     if (kasa.stream().mapToInt(Pieniadz::wartosc).sum() != 5)
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
+
+    // test 9: test na wyjebanie zachłannego wydawania NR od najmniejszych
+    k = new Kasjer();
+    k.dostępDoRozmieniacza(r);
+    k.dostępDoPoczątkowegoStanuKasy(new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł1, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE),
+        new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł2, Rozmienialnosc.NIE) }));
+    reszta = k.rozlicz(9, List.of(new Pieniadz(Nominal.Zł20, Rozmienialnosc.NIE)));
+    kasa = k.stanKasy();
+    if (reszta.stream().mapToInt(Pieniadz::wartosc).sum() != 20 + 11)
+      throw new RuntimeException("Nieprawidlowa suma reszty");
+    if (kasa.stream().mapToInt(Pieniadz::wartosc).sum() != 2)
+      throw new RuntimeException("Nieprawidlowa kasa");
+    r.serialNumberCheck2(kasa, reszta);
+
     System.out.println("All tests passed");
   }
 }
