@@ -208,7 +208,7 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
-    // test 7: w kasie sa 3złR i 5złNR, trzeba wydać 5zł
+    // test 8: w kasie sa 3złR i 5złNR, trzeba wydać 5zł
     k = new Kasjer();
     k.dostępDoRozmieniacza(r);
     k.dostępDoPoczątkowegoStanuKasy(
@@ -223,7 +223,7 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
-    // test 8: test na wyjebanie zachłannego wydawania NR od największych
+    // test 9: test na wyjebanie zachłannego wydawania NR od największych
     k = new Kasjer();
     k.dostępDoRozmieniacza(r);
     k.dostępDoPoczątkowegoStanuKasy(new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE),
@@ -236,7 +236,7 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
-    // test 9: test na wyjebanie zachłannego wydawania NR od najmniejszych
+    // test 10: test na wyjebanie zachłannego wydawania NR od najmniejszych
     k = new Kasjer();
     k.dostępDoRozmieniacza(r);
     k.dostępDoPoczątkowegoStanuKasy(new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł1, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE),
