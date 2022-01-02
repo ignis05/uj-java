@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 class PasswordCracker implements PasswordCrackerInterface {
+  public int attempts = 0;
 
   /**
    * generates next password from passList
@@ -49,6 +50,7 @@ class PasswordCracker implements PasswordCrackerInterface {
     PrintWriter out;
     BufferedReader in;
     String password = null;
+    attempts = 0;
 
     // initialise connection
     try {
@@ -82,6 +84,7 @@ class PasswordCracker implements PasswordCrackerInterface {
         // create and input next password
         String nextPass = getNextPass(passList);
         out.println(nextPass);
+        attempts++;
 
         // check server response - parse correctCount or exit
         String res = in.readLine();
@@ -122,6 +125,7 @@ class PasswordCracker implements PasswordCrackerInterface {
 
             // input password
             out.println(new String(arr));
+            attempts++;
 
             String res2 = in.readLine();
             if (res2.equals("+OK")) {
@@ -170,12 +174,17 @@ class PasswordCracker implements PasswordCrackerInterface {
   }
 
   public static void main(String[] args) {
+    int tests = 100;
+
     var pc = new PasswordCracker();
+    int sum = 0;
     for (int i = 0; i < 100; i++) {
       String pass = pc.getPassword("172.30.24.15", 8080);
       if (pass == null)
         throw new RuntimeException("Password cracking failed");
-      System.out.println("\nPassword " + pass + " is correct");
+      System.out.println("\nPassword " + pass + " is correct (took " + pc.attempts + " attempts)");
+      sum += pc.attempts;
     }
+    System.out.println("\nTest complete: cracked " + tests + " passwords with average of " + (sum / tests) + " attempts per password");
   }
 }
