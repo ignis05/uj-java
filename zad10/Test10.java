@@ -249,6 +249,49 @@ public class Test10 {
       throw new RuntimeException("Nieprawidlowa kasa");
     r.serialNumberCheck2(kasa, reszta);
 
+    // test 11: test sprawdza czy zawsze jak mozemy to wydajemy rozmienialne
+    k = new Kasjer();
+    k.dostępDoRozmieniacza(r);
+    k.dostępDoPoczątkowegoStanuKasy(new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł2, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł2, Rozmienialnosc.TAK),
+        new Pieniadz(Nominal.Zł1, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł5, Rozmienialnosc.NIE) }));
+    reszta = k.rozlicz(45, List.of(new Pieniadz(Nominal.Zł50, Rozmienialnosc.NIE)));
+    kasa = k.stanKasy();
+    if (reszta.stream().mapToInt(Pieniadz::wartosc).sum() != 5 + 50)
+      throw new RuntimeException("Nieprawidlowa suma reszty");
+    int j = 0;
+    for (int i = 0; i < reszta.size(); i++) {
+      if (!reszta.get(i).czyMozeBycRozmieniony()) {
+        j++;
+        if (j > 1) {
+          throw new RuntimeException("W reszcie znalazly sie pieniadze NR podczas gdy bylo wystarczajaco monet R");
+        }
+      }
+    }
+    r.serialNumberCheck2(kasa, reszta);
+
+    // test 12: wydawanie z malych rozmienialnych gdy w kasie daloby sie to zrobic
+    // takze z NR (przypadek gdy NR i R maja identyczne wartosci)
+    k = new Kasjer();
+    k.dostępDoRozmieniacza(r);
+    k.dostępDoPoczątkowegoStanuKasy(
+        new Sup(new Pieniadz[] { new Pieniadz(Nominal.Zł1, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł2, Rozmienialnosc.TAK), new Pieniadz(Nominal.Zł2, Rozmienialnosc.TAK),
+            new Pieniadz(Nominal.Zł1, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł2, Rozmienialnosc.NIE), new Pieniadz(Nominal.Zł2, Rozmienialnosc.NIE) }));
+    reszta = k.rozlicz(5, List.of(new Pieniadz(Nominal.Zł10, Rozmienialnosc.NIE)));
+    kasa = k.stanKasy();
+    if (reszta.stream().mapToInt(Pieniadz::wartosc).sum() != 10 + 5)
+      throw new RuntimeException("Nieprawidlowa suma reszty");
+    j = 0;
+    for (int i = 0; i < reszta.size(); i++) {
+      if (!reszta.get(i).czyMozeBycRozmieniony()) {
+        j++;
+        if (j > 1) {
+          throw new RuntimeException("W reszcie znalazly sie pieniadze NR podczas gdy bylo wystarczajaco monet R");
+        }
+      }
+    }
+    if (kasa.stream().mapToInt(Pieniadz::wartosc).sum() != 5)
+      throw new RuntimeException("Nieprawidlowa kasa");
+    r.serialNumberCheck2(kasa, reszta);
     System.out.println("All tests passed");
   }
 }
