@@ -105,7 +105,7 @@ class PasswordCracker implements PasswordCrackerInterface {
 
             // its the last character in list - it must be correct
             if (passList.get(i).size() == 1) {
-              System.out.println("Found correct character for index " + i + ": " + nextPass.charAt(i));
+              System.out.println("Reached last character (it must be correct) for index " + i + ": " + nextPass.charAt(i));
               // mark this index as known
               known[i] = true;
               knownCount++;
@@ -122,9 +122,10 @@ class PasswordCracker implements PasswordCrackerInterface {
             // if CorrectCount increases that character was wrong, but we know the correct
             char[] arr = nextPass.toCharArray();
             arr[i] = passList.get(i).get(1);
+            String newPass2 = new String(arr);
 
             // input password
-            out.println(new String(arr));
+            out.println(newPass2);
             attempts++;
 
             String res2 = in.readLine();
@@ -134,9 +135,11 @@ class PasswordCracker implements PasswordCrackerInterface {
               break;
             }
             int cor2 = parseCorrectCount(res2);
+            System.out.print("=> Password " + newPass2 + " has " + cor2 + " correct characters");
+
             // the correct count is 1 lower than it was before
             if (cor2 == correctCount - 1) {
-              System.out.println("Found correct character for index " + i + ": " + nextPass.charAt(i));
+              System.out.println(" | Found correct character for index " + i + ": " + nextPass.charAt(i));
               // mark this index as known
               known[i] = true;
               knownCount++;
@@ -148,13 +151,14 @@ class PasswordCracker implements PasswordCrackerInterface {
             }
             // accidently found new correct char
             else if (cor2 == correctCount + 1) {
-              System.out.println("Accidently found correct character for index " + i + ": " + arr[i]);
+              System.out.println(" | Accidently found correct character for index " + i + ": " + arr[i]);
               // mark this index as known
               known[i] = true;
               knownCount++;
               // increment list to that char
               passList.get(i).remove(0);
-            }
+            } else
+              System.out.println();
           }
         }
         // increase all indexes except for known ones
@@ -174,12 +178,12 @@ class PasswordCracker implements PasswordCrackerInterface {
   }
 
   public static void main(String[] args) {
-    int tests = 100;
+    int tests = 1;
 
     var pc = new PasswordCracker();
     int sum = 0;
-    for (int i = 0; i < 100; i++) {
-      String pass = pc.getPassword("172.30.24.15", 8080);
+    for (int i = 0; i < tests; i++) {
+      String pass = pc.getPassword("localhost", 8080);
       if (pass == null)
         throw new RuntimeException("Password cracking failed");
       System.out.println("\nPassword " + pass + " is correct (took " + pc.attempts + " attempts)");
