@@ -10,14 +10,23 @@ import java.util.stream.Collectors;
 class PasswordCracker implements PasswordCrackerInterface {
   public int attempts = 0;
 
-  private String getColoredPasswd(String pass, boolean[] correct, Integer index) {
+  private String getColoredPasswd(String pass, boolean[] correct, List<List<Character>> passList, Integer index) {
     StringBuilder res = new StringBuilder();
     char[] arr = pass.toCharArray();
     for (int i = 0; i < arr.length; i++) {
-      if (correct[i])
-        res.append("\u001B[0;32m"); // green
-      if (index != null && index.intValue() == i)
+      if (index != null) {
+        if (index.intValue() == i)
+          res.append("\u001B[0;33m"); // yellow
+      } else
         res.append("\u001B[0;33m"); // yellow
+
+      if (correct[i]) {
+        if (passList.get(i).get(0).charValue() == arr[i])
+          res.append("\u001B[0;32m"); // green
+        else
+          res.append("\u001B[0;31m"); // red
+      }
+
       res.append(arr[i]);
       res.append("\u001B[0m"); // reset
     }
@@ -107,7 +116,7 @@ class PasswordCracker implements PasswordCrackerInterface {
           break;
         }
         int correctCount = parseCorrectCount(res);
-        System.out.println("Password " + getColoredPasswd(nextPass, known, null) + " has " + correctCount + " correct characters");
+        System.out.println("Password " + getColoredPasswd(nextPass, known, passList, null) + " has " + correctCount + " correct characters");
 
         // calculate how many characters can be found from this password
         int toFind = correctCount - knownCount;
@@ -149,7 +158,7 @@ class PasswordCracker implements PasswordCrackerInterface {
               break;
             }
             int cor2 = parseCorrectCount(res2);
-            System.out.print("=> Password " + getColoredPasswd(newPass2, known, i) + " has " + cor2 + " correct characters");
+            System.out.print("Password " + getColoredPasswd(newPass2, known, passList, i) + " has " + cor2 + " correct characters");
 
             // the correct count is 1 lower than it was before
             if (cor2 == correctCount - 1) {
