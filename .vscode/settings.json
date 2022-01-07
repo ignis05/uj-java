@@ -1,5 +1,4 @@
 {
 	"java.format.settings.url": ".vscode/java-formatter.xml",
-	"java.project.sourcePaths": ["examples", "zad06", "zad07", "zad08", "zad09", "zad10", "zad11", "zad12"],
-	"terminal.integrated.defaultProfile.windows": "PowerShell"
+	"java.project.sourcePaths": ["examples", "zad06", "zad07", "zad08", "zad09", "zad10", "zad11", "zad12"]
 }

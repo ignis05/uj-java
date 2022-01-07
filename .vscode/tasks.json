@@ -5,6 +5,17 @@
 	"tasks": [
 		{
 			"type": "shell",
+			"label": "Compile and launch in powershell",
+			"command": "javac ${fileBasename}; java ${fileBasenameNoExtension}",
+			"options": {
+				"shell": { "executable": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" },
+				"cwd": "${fileDirname}"
+			},
+			"detail": "Compiles and launches in powershell",
+			"problemMatcher": []
+		},
+		{
+			"type": "shell",
 			"label": "Run with arguments",
 			"command": "javac ${fileBasename} && xargs -d '\n' java ${fileBasenameNoExtension} < ${fileBasenameNoExtension}.args",
 			"options": {
