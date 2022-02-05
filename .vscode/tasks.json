@@ -5,6 +5,16 @@
 	"tasks": [
 		{
 			"type": "shell",
+			"label": "Compile and launch",
+			"command": "javac ${fileBasename}; java ${fileBasenameNoExtension}",
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"detail": "Compiles and launches in default terminal",
+			"problemMatcher": []
+		},
+		{
+			"type": "shell",
 			"label": "Compile and launch in powershell",
 			"command": "javac ${fileBasename}; java ${fileBasenameNoExtension}",
 			"options": {
